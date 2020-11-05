@@ -1,0 +1,196 @@
+<template>
+	<gracePage :customHeader="false">
+		<!-- 页面主体 -->
+		<view slot="gBody">
+			<view class="grace-nowrap grace-fixed-top grace-flex-vcenter grace-bg-white">
+				<!-- 名称排序 -->
+				<view class="graceSelectMenuItem">
+					<graceSelectMenu :show="show1" :items="selectMenu1" @showMenu="showMenu1" 
+					@close="closeMenu1" @select="select1" :height="500" :selectIndex="selectVal1"></graceSelectMenu>
+				</view>
+				<!-- 价格排序 -->
+				<view class="graceSelectMenuItem">
+					<graceSelectMenu 
+					:show="show2" :height="500" :items="selectMenu2" :selectIndex="selectVal2" 
+					@showMenu="showMenu2" @close="closeMenu2" @select="select2"></graceSelectMenu>
+				</view>
+				<!-- 分类排序 -->
+				<view class="graceSelectMenuItem grace-nowrap grace-flex-center grace-flex-vcenter">
+					<graceSelectMenu
+					:show="show3" :height="500" :items="selectMenu3" :selectIndex="selectVal3" 
+					@showMenu="showMenu3" @close="closeMenu3" @select="select3"></graceSelectMenu>
+				</view>
+			<!-- 	<view class="graceSelectMenuItem grace-nowrap grace-flex-center grace-flex-vcenter" @tap="openFilter">
+					<text style="font-size:26rpx;">条件筛选</text>
+					<text class="grace-icons icon-filter" style="font-size:26rpx; margin:5rpx 0 0 5rpx;"></text>
+				</view> -->
+			</view>
+			<!-- 这个 view 是用于占位的 避免吸顶元素遮住下面的内容 -->
+			<view style="height:100rpx;"></view>
+			<!-- 页面数据展示 -->
+			<view class="grace-text-center">
+				<view class="">
+					<graceSwipeList :msgs="msgs" @itemTap="itemTap" @btnTap="btnTap"></graceSwipeList>
+				</view>
+			</view>
+		</view>
+		
+		<!-- 底部 -->
+		<view slot="gFooter">
+			<button>上传商品</button>
+		</view>
+	</gracePage>
+</template>
+<script>
+import gracePage from "../../graceUI/components/gracePage.vue";
+import graceSelectMenu from "../../graceUI/components/graceSelectMenu.vue";
+import graceDrawer from '../../graceUI/components/graceDrawer.vue';
+import graceSelectTags from '../../graceUI/components/graceSelectTags.vue';
+import graceSwipeList from "../../graceUI/components/graceSwipeListmy.vue";
+var systemInfo = require('../../graceUI/jsTools/systemInfo.js');
+// 模拟个 api 请求的数据
+var msgsFromApi = [
+	{
+		img       : 'https://fudezao.oss-cn-qingdao.aliyuncs.com/statics/uper/201909/23/5d882ce3900b7.png',
+		msgnumber : 8,
+		title     : "商品名称",
+		price      : "商品现价",
+		originalPrice   : "商品原价"
+	},
+	{
+		img       : 'https://fudezao.oss-cn-qingdao.aliyuncs.com/statics/uper/201909/23/5d882db43842c.png',
+		msgnumber : 0,
+		title     : "账户通知",
+		price      : "2019-08-11",
+		originalPrice   : "您的账户入账 *** 元"
+	},
+	{
+		img       : 'https://fudezao.oss-cn-qingdao.aliyuncs.com/statics/uper/201909/23/5d882ce3900b7.png',
+		msgnumber : 12,
+		title     : "优惠促销",
+		price      : "昨天",
+		originalPrice   : "草木有本心，何求美人折？"
+	},
+];
+export default {
+	data(){
+		return {
+			// 第1个菜单
+			selectVal1 : 0,
+			show1 : false,
+			selectMenu1 : ['综合排序', '价格排序', '评价排序', '人气排序'],
+			// 第2个菜单
+			selectVal2 : 0,
+			show2 : false,
+			selectMenu2 : ['不限价格', '100 - 1000', '1000 - 10000', '10000 +'],
+			// 第3个菜单
+			selectVal3 : 0,
+			show3 : false,
+			selectMenu3 : ['全部颜色', '黑色', '蓝色', '红色'],
+			
+			// 侧边抽屉
+			filterHeight : 300,
+			scrollHeight : 300,
+			showFilter : false,
+			filterVal1 : 0, // 用于保存选中值、参与表单提交
+			filterItems1: [
+				{ name: '条件1', value: '0', checked: true },
+				{ name: '条件2', value: '1', checked: false },
+				{ name: '条件3', value: '2', checked: false },
+				{ name: '条件4', value: '3', checked: false },
+				{ name: '条件5', value: '4', checked: false },
+				{ name: '条件6', value: '5', checked: false }
+			],
+			msgs : [],//
+		}
+	},
+	onLoad : function () {
+		var system = systemInfo.info();
+		this.filterHeight = system.windowHeight;
+		this.scrollHeight = system.windowHeight - 80;
+		
+		// 模拟 api 请求，因为请求数据里没有按钮信息我们利用js进行按钮补充
+		setTimeout(() => {
+			for(let i = 0; i < msgsFromApi.length; i++){
+				// 具体几个按钮及按钮文本根据项目需求来，格式 {name:按钮文本, bgColor:按钮背景色}
+				msgsFromApi[i].btns = [{'name':'删除', bgColor:'#FF0036'}];
+			}
+			this.msgs = msgsFromApi;
+		}, 500);
+	},
+	components:{
+		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList
+	},
+	methods:{
+		// 下拉选择
+		showMenu1  : function () {this.show1 = true;},
+		closeMenu1 : function () {this.show1 = false;},
+		select1    : function (index) {
+			console.log("选择了 " + this.selectMenu1[index]);
+		},
+		showMenu2  : function () {this.show2 = true;},
+		closeMenu2 : function () {this.show2 = false;},
+		select2    : function (index) {
+			console.log("选择了 " + this.selectMenu2[index]);
+		},
+		showMenu3  : function () {this.show3 = true;},
+		closeMenu3 : function () {this.show3 = false;},
+		select3    : function (index) {
+			console.log("选择了 " + this.selectMenu3[index]);
+		},
+		// 条件筛选
+		openFilter : function () {
+			this.showFilter = true;
+		},
+		closeFilter : function () {
+			this.showFilter = false;
+		},
+		// 可选标签事件
+		filterChange1 : function (val) {
+			this.filterVal1 = val;
+		},
+		filterSubmit : function () {
+			// 收集相关数据,如:
+			console.log(this.filterVal1);
+			// 关闭筛选
+			this.showFilter = false;
+		},
+		filterReset : function () {
+			// 将筛选的值恢复初始即可，如:
+			//this.*** = ***;
+			this.$refs.graceSelectTags1.graceSelectChange(0);
+		},
+		
+		btnTap : function(index, btnIndex){
+			console.log(index, btnIndex);
+			// 第一个按钮被点击 [ 标记已读 ]
+			if(btnIndex == 0){
+				uni.showModal({
+					title:"确定要删除吗?",
+					success: (e) => {
+						if(e.confirm){this.msgs.splice(index, 0);}
+					}
+				});
+			}
+		},
+		// 列表本身被点击
+		itemTap : function (e) {
+			console.log(e);
+			uni.showToast({title:"索引"+e});
+		}
+	}
+}
+</script>
+<style>
+/* #ifdef H5 */
+.grace-fixed-top{
+	top:44px;
+	display:flex;
+	justify-content:center;
+}
+/* #endif */
+.graceSelectMenuItem{width:187rpx; line-height:90rpx;}
+
+.grace-filter-buttons{position:absolute; z-index:9999; width:680rpx; left:0; bottom:0; height:50px; box-sizing:border-box;}
+.grace-filter-button{width:600rpx; height:50px; line-height:50px; text-align:center; font-size:28rpx; display:block;}
+</style>
