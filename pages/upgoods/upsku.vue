@@ -20,6 +20,12 @@
 					:show="show3" :height="500" :items="selectMenu3" :selectIndex="selectVal3" 
 					@showMenu="showMenu3" @close="closeMenu3" @select="select3"></graceSelectMenu>
 				</view>
+				<!-- 分类排序 -->
+				<view class="graceSelectMenuItem grace-nowrap grace-flex-center grace-flex-vcenter">
+					<graceSelectMenu
+					:show="show4" :height="500" :items="selectMenu4" :selectIndex="selectVal4" 
+					@showMenu="showMenu4" @close="closeMenu4" @select="select4"></graceSelectMenu>
+				</view>
 			<!-- 	<view class="graceSelectMenuItem grace-nowrap grace-flex-center grace-flex-vcenter" @tap="openFilter">
 					<text style="font-size:26rpx;">条件筛选</text>
 					<text class="grace-icons icon-filter" style="font-size:26rpx; margin:5rpx 0 0 5rpx;"></text>
@@ -30,7 +36,22 @@
 			<!-- 页面数据展示 -->
 			<view class="grace-text-center">
 				<view class="">
-					<graceSwipeList :msgs="msgs" @itemTap="itemTap" @btnTap="btnTap"></graceSwipeList>
+					 <view class="uni-list">
+						<checkbox-group @change="checkboxChange">
+							<label class="uni-list-cell uni-list-cell-pd groupGoodslist" v-for="(item,index) in groupGoodsList" :key="index">
+								<view>
+									<checkbox  :checked="item.checked" />
+								</view>
+								<view><image :src="item.img" class="groupgoods-img"></image></view>
+								<view class="groupgoods-info">
+									<view class="groupgoods-title">【{{item.title}}】约500克/份</view>
+									<view class="groupgoods-price">团购价:￥{{item.price}}</view>
+									<view class="groupgoods-originalPrice">原价:￥{{item.originalPrice}}</view>
+								</view>
+								<view><button type="default" class="grace-button" size="mini">上架</button></view>
+							</label>
+						</checkbox-group>
+					</view>
 				</view>
 			</view>
 			
@@ -84,8 +105,10 @@
 		<!-- 底部 -->
 		<view slot="gFooter" style="z-index: 0;">
 			<view class="footer">
-				<view class="footertext">共20个商品</view>
-				<button class="btn" @tap="showShade">上传商品</button>
+				<button class="btn" @click="selectChexkbox">全选</button>
+				<button class="btn">下架</button>
+				<button class="btn">上架</button>
+				<button class="btn" @tap="showShade">发布</button>
 			</view>
 		</view>
 	</gracePage>
@@ -138,6 +161,9 @@ export default {
 			selectVal3 : 0,
 			show3 : false,
 			selectMenu3 : ['商品分类', '黑色', '蓝色', '红色'],
+			selectVal4 : 0,
+			show4 : false,
+			selectMenu4 : ['上架', '下架'],
 			
 			// 侧边抽屉
 			filterHeight : 300,
@@ -160,6 +186,9 @@ export default {
 				title:'新鲜蔬菜',
 				img:''
 			},
+			groupGoodsList:[
+				{id:1,title:'小白菜',img:'https://fudezao.oss-cn-qingdao.aliyuncs.com/statics/uper/201909/23/5d882ce3900b7.png',
+			originalPrice:6,price:5,checked:true}],
 			skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}]	
 			
 			// 上传按钮名称
@@ -199,6 +228,11 @@ export default {
 		select3    : function (index) {
 			console.log("选择了 " + this.selectMenu3[index]);
 		},
+		showMenu4  : function () {this.show4 = true;},
+		closeMenu4 : function () {this.show4 = false;},
+		select4    : function (index) {
+			console.log("选择了 " + this.selectMenu4[index]);
+		},
 		// 条件筛选
 		openFilter : function () {
 			this.showFilter = true;
@@ -234,6 +268,21 @@ export default {
 				});
 			}
 		},
+		//全选 或者反选
+		selectChexkbox(){
+			if(this.groupGoodsList!=null && this.groupGoodsList.length>0){
+				var checked = this.groupGoodsList[0].checked;
+				if(checked){
+					checked =false;
+				}else{
+					checked = true;
+				}
+				this.groupGoodsList.forEach(p=>{
+					p.checked=checked;
+				});
+			}
+		},
+		
 		// 列表本身被点击
 		itemTap : function (e) {
 			console.log(e);
@@ -365,6 +414,30 @@ export default {
     border-radius: 5px;
 }
 .close-btn{width:80rpx; height:80rpx; line-height:80rpx; text-align:center; font-size:40rpx; z-index:7;}
+
+.groupGoodslist{
+	display: flex;
+	justify-content: space-around;
+	flex-direction: row;
+	align-items: center;
+}
+.groupGoodslist .groupgoods-img{
+	display: flex;
+	width: 3rem;
+	height: 3rem;
+}
+.groupgoods-title{
+	font-weight: bold;
+	padding: 0.1rem
+}
+.groupgoods-price{
+	color:red;
+	padding: 0.1rem
+}
+.groupgoods-originalPrice{
+	padding: 0.1rem
+}
+
 
 .skulist{
 	display: flex;
