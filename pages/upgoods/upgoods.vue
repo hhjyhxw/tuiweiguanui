@@ -40,8 +40,8 @@
 				<view class="addgoods-box grace-relative" @tap.stop="">
 					<!-- 图片选择  -->
 					<view class="goods-imgbox">
-						<button class="goods-imgbox-icon" v-if="goodsimg==''" @tap="chooseImg()">+添加图片</button>
-						<image class="goods-msg-in" :src="goodsimg" @tap="chooseImg()"/>
+						<button class="goods-imgbox-icon" v-if="spu.img==''" @tap="chooseImg()">+添加图片</button>
+						<image class="goods-msg-in" :src="spu.img" @tap="chooseImg()"/>
 					</view>
 					<view class="goods-title">
 						<input value="" placeholder="商品名称" style="text-align: center;"/>
@@ -56,7 +56,28 @@
 							<input type="number" placeholder="请输入计量单位(份)"/>
 						</view>
 					</view>
-					<view class="close-btn grace-icons icon-close3 grace-white grace-absolute-rt" @tap.stop="closeShade"></view>
+					<view class="skulist">
+						<view class="skuitem">
+							<text class="skucell">规格名称</text>
+							<text class="skucell">单位</text>
+							<text class="skucell">原价</text>
+							<text class="skucell">团购价</text>
+							<text class="skucell">库存</text>
+							<text class="skucell">+</text>
+						</view>
+						<view class="skuitem" v-for="(item,index) in skulist" :key="index">
+							<input class="skucell" :value="item.title" />
+							<input class="skucell" :value="item.unit"/>
+							<input class="skucell" :value="item.originalPrice"/>
+							<input class="skucell" :value="item.price"/>
+							<input class="skucell" :value="item.stock"/>
+							<text class="skucell">-</text>
+						</view>
+					</view>
+					<view class="skufooter">
+						<button class="btn"  @tap.stop="closeShade">关闭</button>
+						<button class="btn" @tap="save">保存</button>
+					</view>
 				</view>
 			</graceShade>
 		</view>
@@ -76,6 +97,11 @@ import graceDrawer from '../../graceUI/components/graceDrawer.vue';
 import graceSelectTags from '../../graceUI/components/graceSelectTags.vue';
 import graceSwipeList from "../../graceUI/components/graceSwipeListmy.vue";
 import graceShade from "../../graceUI/components/graceShade.vue";
+import uniSection from '@/components/uni-section/uni-section.vue';
+import uniGrid from '@/components/uni-grid/uni-grid.vue';
+import uniGridItem from '@/components/uni-grid-item/uni-grid-item.vue';
+import uniBadge from '@/components/uni-badge/uni-badge.vue';
+
 var systemInfo = require('../../graceUI/jsTools/systemInfo.js');
 // 模拟个 api 请求的数据
 var msgsFromApi = [
@@ -134,6 +160,12 @@ export default {
 			goodsimg:'',
 			category:[{id:1,title:'蔬菜'},{id:2,title:'水果'}],
 			index: 0,
+			spu:{
+				title:'新鲜蔬菜',
+				img:''
+			},
+			skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}]	
+			
 			// 上传按钮名称
 		}
 	},
@@ -152,7 +184,11 @@ export default {
 		}, 500);
 	},
 	components:{
-		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList,graceShade
+		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList,graceShade,
+		uniSection,
+		uniGrid,
+		uniGridItem,
+		uniBadge
 	},
 	methods:{
 		// 下拉选择
@@ -224,7 +260,7 @@ export default {
 		chooseImg() { //选择图片
 			const that = this
 			that.$api.uploadImg((res => {
-				that.goodsimg = res;
+				that.spu.img = res;
 			}))
 		},
 		 bindPickerChange: function(e) {
@@ -236,7 +272,7 @@ export default {
 </script>
 <style>
 .grace-bg-white{
-	background: #B2DFEE !important;
+	background: white !important;
 }
 /* #ifdef H5 */
 .grace-fixed-top{
@@ -249,11 +285,12 @@ export default {
 
 .grace-filter-buttons{position:absolute; z-index:9999; width:680rpx; left:0; bottom:0; height:50px; box-sizing:border-box;}
 .grace-filter-button{width:600rpx; height:50px; line-height:50px; text-align:center; font-size:28rpx; display:block;}
-.footer{display: flex;justify-content: space-around;
+.footer{
+	display: flex;justify-content: space-around;
     text-align: center;
     align-items: center;
     border-top: 1px solid;
-	background: #B2DFEE !important;
+	background: white !important;
 }
 .grace-page-footer{
 	z-index: 0 !important;
@@ -264,7 +301,7 @@ export default {
 .footer .btn{
 	width: 100%;
 	flex: 1;
-	background: #B2DFEE !important;
+	background: #white !important;
 }
 
 .grace-shade{
@@ -272,7 +309,7 @@ export default {
 }
 .addgoods-box{
     z-index: 2;
-    background: lavender !important;
+    background: white !important;
 	width: 25.8rem;
 	height: 43.2rem;
 	margin-top: 2.8rem;
@@ -286,6 +323,7 @@ export default {
 }
 .goods-imgbox{
 	position: relative;
+	padding: 1rem;
 }
 .goods-imgbox-icon{
 	position: absolute;
@@ -306,14 +344,14 @@ export default {
 	justify-content: center;
 	align-items: center;
 	padding: 1rem;
-	background-color: #AEEEEE;
+	background-color: white;
 }
 .goods-tab{
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	padding: 0.5rem;
-	background-color: #AEEEEE;
+	background-color: white;
 	border-top:1px solid lightgrey;
 	border-bottom:1px solid lightgrey;
 }
@@ -335,4 +373,46 @@ export default {
     border-radius: 5px;
 }
 .close-btn{width:80rpx; height:80rpx; line-height:80rpx; text-align:center; font-size:40rpx; z-index:7;}
+
+.skulist{
+	display: flex;
+	flex-direction: column;
+}
+.skuitem{
+	    display: flex;
+	    -webkit-box-orient: vertical;
+	    -webkit-box-direction: normal;
+	    -webkit-flex-direction: column;
+	    flex-direction: row;
+	    -webkit-justify-content: space-around;
+	    justify-content: center;
+		width: 100%;
+
+}
+.skucell{
+	flex: 1;
+	text-align: center;
+	border: 1px solid lightgray;
+	height: 2rem;
+	line-height: 2rem;
+}
+.skufooter{
+	position: fixed;
+	display: flex;justify-content: space-around;
+	text-align: center;
+	align-items: center;
+	border-top: 1px solid;
+	background: white !important;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	
+	
+}
+.skufooter .btn{
+		width: 80%;
+		flex: 1;
+		background: #white !important;
+	}
+
 </style>
