@@ -112,7 +112,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/card.png', 
 					txt:'商品上架', smallTxt:"", bgColor:"#C4A6FB",
-					path:"./index?test=1", openType:"navigate"
+					path:"/pages/upgoods/upsku", openType:"navigate"
 				},
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/lady.png', 

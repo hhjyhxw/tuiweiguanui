@@ -74,11 +74,6 @@
 							<text class="skucell">-</text>
 						</view>
 					</view>
-					<view class="release-content">
-						<view>
-							<textarea name="content" placeholder="请输入商品详情......" class="release-content-input" value="" v-model="spu.detail"/>
-						</view>
-					</view>
 					<view class="skufooter">
 						<button class="btn"  @tap.stop="closeShade">关闭</button>
 						<button class="btn" @tap="save">保存</button>
@@ -102,10 +97,6 @@ import graceDrawer from '../../graceUI/components/graceDrawer.vue';
 import graceSelectTags from '../../graceUI/components/graceSelectTags.vue';
 import graceSwipeList from "../../graceUI/components/graceSwipeListmy.vue";
 import graceShade from "../../graceUI/components/graceShade.vue";
-import uniSection from '@/components/uni-section/uni-section.vue';
-import uniGrid from '@/components/uni-grid/uni-grid.vue';
-import uniGridItem from '@/components/uni-grid-item/uni-grid-item.vue';
-import uniBadge from '@/components/uni-badge/uni-badge.vue';
 
 var systemInfo = require('../../graceUI/jsTools/systemInfo.js');
 // 模拟个 api 请求的数据
@@ -167,8 +158,7 @@ export default {
 			index: 0,
 			spu:{
 				title:'新鲜蔬菜',
-				img:'',
-				detail:''
+				img:''
 			},
 			skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}]	
 			
@@ -190,11 +180,7 @@ export default {
 		}, 500);
 	},
 	components:{
-		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList,graceShade,
-		uniSection,
-		uniGrid,
-		uniGridItem,
-		uniBadge
+		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList,graceShade
 	},
 	methods:{
 		// 下拉选择

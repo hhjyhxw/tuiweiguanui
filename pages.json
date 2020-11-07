@@ -131,10 +131,10 @@
             }
         },
 		{
-		    "path" : "pages/upgoods/addgoods",
+		    "path" : "pages/upgoods/upsku",
 		    "style" :                                                                                    
 		    {
-		        "navigationBarTitleText": "商品上传",
+		        "navigationBarTitleText": "商品上架",
 		        "enablePullDownRefresh": false
 		    }
 		}
