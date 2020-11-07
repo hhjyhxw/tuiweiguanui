@@ -261,6 +261,7 @@ const uploadImg = (successCallback) => {
 					url: baseUrl + '/upload',
 					method: 'get',
 					success: function(signRes) {
+						console.log("signRes==="+JSON.stringify(signRes))
 						uni.showLoading({
 							title: '图片上传中',
 						})
@@ -278,6 +279,7 @@ const uploadImg = (successCallback) => {
 								signature: signRes.data.signature
 							},
 							success: function(uploadRes) {
+								console.log("result==="+JSON.stringify(uploadRes))
 								uni.hideLoading()
 								if (uploadRes.statusCode === 200) {
 									if (successCallback) {

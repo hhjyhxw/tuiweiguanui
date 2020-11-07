@@ -33,20 +33,49 @@
 					<graceSwipeList :msgs="msgs" @itemTap="itemTap" @btnTap="btnTap"></graceSwipeList>
 				</view>
 			</view>
+			
+			
+			<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
+			<graceShade @closeShade="closeShade" ref="graceShade">
+				<view class="addgoods-box grace-relative" @tap.stop="">
+					<!-- 图片选择  -->
+					<view class="goods-imgbox">
+						<button class="goods-imgbox-icon" v-if="goodsimg==''" @tap="chooseImg()">+添加图片</button>
+						<image class="goods-msg-in" :src="goodsimg" @tap="chooseImg()"/>
+					</view>
+					<view class="goods-title">
+						<input value="" placeholder="商品名称" style="text-align: center;"/>
+					</view>
+					<view class="goods-tab">
+						<view class="uni-list-cell-db">
+							<picker @change="bindPickerChange" :value="index" :range="category">
+								<view class="uni-input">{{category[index].title}}</view>
+							</picker>
+						</view>
+						<view class="unite">
+							<input type="number" placeholder="请输入计量单位(份)"/>
+						</view>
+					</view>
+					<view class="close-btn grace-icons icon-close3 grace-white grace-absolute-rt" @tap.stop="closeShade"></view>
+				</view>
+			</graceShade>
 		</view>
-		
 		<!-- 底部 -->
-		<view slot="gFooter">
-			<button>上传商品</button>
+		<view slot="gFooter" style="z-index: 0;">
+			<view class="footer">
+				<view class="footertext">共20个商品</view>
+				<button class="btn" @tap="showShade">上传商品</button>
+			</view>
 		</view>
 	</gracePage>
 </template>
 <script>
-import gracePage from "../../graceUI/components/gracePage.vue";
+import gracePage from "../../graceUI/components/gracePageUpgoods.vue";
 import graceSelectMenu from "../../graceUI/components/graceSelectMenu.vue";
 import graceDrawer from '../../graceUI/components/graceDrawer.vue';
 import graceSelectTags from '../../graceUI/components/graceSelectTags.vue';
 import graceSwipeList from "../../graceUI/components/graceSwipeListmy.vue";
+import graceShade from "../../graceUI/components/graceShade.vue";
 var systemInfo = require('../../graceUI/jsTools/systemInfo.js');
 // 模拟个 api 请求的数据
 var msgsFromApi = [
@@ -102,6 +131,10 @@ export default {
 				{ name: '条件6', value: '5', checked: false }
 			],
 			msgs : [],//
+			goodsimg:'',
+			category:[{id:1,title:'蔬菜'},{id:2,title:'水果'}],
+			index: 0,
+			// 上传按钮名称
 		}
 	},
 	onLoad : function () {
@@ -119,7 +152,7 @@ export default {
 		}, 500);
 	},
 	components:{
-		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList
+		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList,graceShade
 	},
 	methods:{
 		// 下拉选择
@@ -177,11 +210,34 @@ export default {
 		itemTap : function (e) {
 			console.log(e);
 			uni.showToast({title:"索引"+e});
-		}
+		},
+		/* 弹窗相关start */
+		showShade : function () {
+			this.$refs.graceShade.showIt();
+		},
+		closeShade : function () {
+			this.$refs.graceShade.hideIt();
+		},
+		/* 弹窗相关end */
+		
+		/* 选择图片 */
+		chooseImg() { //选择图片
+			const that = this
+			that.$api.uploadImg((res => {
+				that.goodsimg = res;
+			}))
+		},
+		 bindPickerChange: function(e) {
+			console.log('picker发送选择改变，携带值为', e.target.value)
+			this.index = e.target.value
+		},
 	}
 }
 </script>
 <style>
+.grace-bg-white{
+	background: #B2DFEE !important;
+}
 /* #ifdef H5 */
 .grace-fixed-top{
 	top:44px;
@@ -193,4 +249,90 @@ export default {
 
 .grace-filter-buttons{position:absolute; z-index:9999; width:680rpx; left:0; bottom:0; height:50px; box-sizing:border-box;}
 .grace-filter-button{width:600rpx; height:50px; line-height:50px; text-align:center; font-size:28rpx; display:block;}
+.footer{display: flex;justify-content: space-around;
+    text-align: center;
+    align-items: center;
+    border-top: 1px solid;
+	background: #B2DFEE !important;
+}
+.grace-page-footer{
+	z-index: 0 !important;
+}
+.footer .footertext{
+	flex: 1;
+}
+.footer .btn{
+	width: 100%;
+	flex: 1;
+	background: #B2DFEE !important;
+}
+
+.grace-shade{
+	background: rgba(0, 0, 0, 0.5) !important
+}
+.addgoods-box{
+    z-index: 2;
+    background: lavender !important;
+	width: 25.8rem;
+	height: 43.2rem;
+	margin-top: 2.8rem;
+}
+.goods-add-icon{
+	font-size: 44px;
+	height: 44px;
+	line-height: 44px;
+	margin-bottom: 11px;
+	color: #999999;
+}
+.goods-imgbox{
+	position: relative;
+}
+.goods-imgbox-icon{
+	position: absolute;
+	top: 6rem;
+	left: 37%;
+}
+.goods-msg-in{
+	    width: 100%;
+	    height: 240px;
+	    display: block;
+	    overflow: hidden;
+	    position: relative;
+	    margin: auto;
+		border-bottom: 1px solid lightgray;
+}
+.goods-title{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 1rem;
+	background-color: #AEEEEE;
+}
+.goods-tab{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0.5rem;
+	background-color: #AEEEEE;
+	border-top:1px solid lightgrey;
+	border-bottom:1px solid lightgrey;
+}
+.uni-list-cell-db{
+	flex: 1;
+}
+.unite{
+	flex: 1;
+}
+.grace-add-list-items-my {
+    width: 100% !important; 
+    height: 243px !important; 
+    overflow: hidden;
+    margin-bottom: 5px !important; 
+    margin-right: 0px !important; 
+    background: #F6F7F8;
+    font-size: 0;
+    position: relative;
+    border-radius: 5px;
+}
+.close-btn{width:80rpx; height:80rpx; line-height:80rpx; text-align:center; font-size:40rpx; z-index:7;}
 </style>

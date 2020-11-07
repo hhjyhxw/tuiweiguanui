@@ -129,8 +129,15 @@
                 "navigationBarTitleText": "商品上传",
                 "enablePullDownRefresh": false
             }
-            
-        }
+        },
+		{
+		    "path" : "pages/upgoods/addgoods",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "商品上传",
+		        "enablePullDownRefresh": false
+		    }
+		}
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
