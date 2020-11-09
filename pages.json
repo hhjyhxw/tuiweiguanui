@@ -138,6 +138,15 @@
 		        "enablePullDownRefresh": false
 		    }
 		}
+        ,{
+            "path" : "pages/shopcategory/shopcategory",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

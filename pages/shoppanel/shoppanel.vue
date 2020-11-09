@@ -117,7 +117,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/lady.png', 
 					txt:'商品分类', smallTxt:"", bgColor:"#9CDDEA",
-					path:"./index?test=1", openType:"navigate"
+					path:"/pages/shopcategory/shopcategory", openType:"navigate"
 				}
 			],
 			marketclasses : [
