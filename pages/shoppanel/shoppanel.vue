@@ -129,7 +129,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/tmp.png', 
 					txt:'优惠券', smallTxt:"", bgColor:"#C4A6FB",
-					path:"./index?test=1", openType:"navigate"
+					path:"/pages/shopcoupon/shopcoupon", openType:"navigate"
 				},
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',

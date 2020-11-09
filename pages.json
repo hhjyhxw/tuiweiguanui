@@ -147,6 +147,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/shopcoupon/shopcoupon",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
