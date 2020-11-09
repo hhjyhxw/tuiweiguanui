@@ -142,7 +142,7 @@
             "path" : "pages/shopcategory/shopcategory",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
+                "navigationBarTitleText": "商品分类",
                 "enablePullDownRefresh": false
             }
             

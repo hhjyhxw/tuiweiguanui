@@ -3,15 +3,15 @@
 		<view slot="gBody" class="grace-flex-v1" id="gBody">
 			<!-- 数据区域 -->
 			<view class="grace-cate-wrap grace-space-between">
-				<button  class="grace-cate-left-item" style="position: fixed;width: 110px;top: 43px;left:0;z-index: 2;display: flex;justify-content: center;align-items: center;border: 1px solid lightgray;">添加分类</button>
+				<button @click="showShade" class="grace-cate-left-item" style="position: fixed;width: 110px;top: 43px;left:0;z-index: 2;display: flex;justify-content: center;align-items: center;border: 1px solid lightgray;">添加分类</button>
 				<scroll-view scroll-y scroll-with-animation class="grace-cate-left grace-scroll-y" :style="{height:mainHeight+'px'}" :scroll-into-view="leftTo">
 					<view  :class="['category-item', currentCateIndex == index ? 'grace-cate-left-current' : '']" v-for="(item,index) in categorylist" :key="index">
 						<view class="category-name">{{item.title}}</view>
 						<view class="caategory-icon">x</view>
 					</view>
 				</scroll-view>
-				<scroll-view :scroll-into-view="productListTo" scroll-with-animation 
-					scroll-y class="grace-cate-right grace-scroll-y" :style="{height:mainHeight+'px'}" @scroll="rscroll">
+				<scroll-view  scroll-with-animation 
+					scroll-y class="grace-cate-right grace-scroll-y" :style="{height:mainHeight+'px'}">
 					<view>
 						<image :src="category.picUrl" class="category-main-img"></image>
 					</view>
@@ -29,18 +29,42 @@
 									</view>
 								</block>
 								<view class="uni-uploader__input-box" v-show="categorysonlist.length < 5">
-									<view class="uni-uploader__input" @tap="chooseImg(item,index)"></view>
+									<view class="uni-uploader__input" @click="showShade"></view>
 								</view>
 							</view>
 						</view>
 					</view>
 				</scroll-view>
 			</view>
+			<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
+			<graceShade @closeShade="closeShade" ref="graceShade">
+				<view class="addgoods-box grace-relative" @tap.stop="">
+					<view class="category-box-title">{{selectcategorytitle}}</view>
+					<view class="my-form-item">
+						<text class="my-form-label">分类名称</text>
+						<input class="my-form-input" />
+					</view>
+					<view class="my-form-item">
+						<text class="my-form-label-start">分类图片</text>
+						<!-- 图片选择  -->
+						<view class="goods-imgbox">
+							<button class="goods-imgbox-icon" v-if="category.picUrl==''" @tap="chooseImg()">+添加图片</button>
+							<image class="goods-msg-in" :src="category.picUrl" @tap="chooseImg()"/>
+						</view>
+					</view>
+					
+					<view class="skufooter">
+						<button class="btn"  @tap.stop="closeShade">关闭</button>
+						<button class="btn" @tap="save">保存</button>
+					</view>
+				</view>
+			</graceShade>
 		</view>
 	</gracePage>
 </template>
 <script>
 import gracePage from "../../graceUI/components/gracePage.vue";
+import graceShade from "../../graceUI/components/graceShade.vue";
 var pageHeight = 500;
 export default {
     data() {
@@ -52,6 +76,7 @@ export default {
 			leftTo : 'cate1',
 			// 延迟执行防止卡顿
 			scrollTimer : null,
+			selectcategorytitle:'添加一级分类',//根据被选择的分类动态修改
 			category:{id:1,title:'新鲜蔬菜',picUrl:'../../static/emptyCart.jpg'},
 			categorylist:[
 				{id:1,title:'新鲜蔬菜',picUrl:''},
@@ -76,12 +101,7 @@ export default {
 		
 	},
 	methods:{
-		rscroll : function(e){
-			if(this.scrollTimer != null){
-				clearTimeout(this.scrollTimer);
-			}
-			this.scrollTimer = setTimeout(()=>{this.getIndex();}, 100);
-		},
+		
 		
 		gotoinfo : function(e){
 			console.log(e);
@@ -89,19 +109,30 @@ export default {
 				title:"商品id " + e
 			});
 		},
-		chooseImg(item,index) { //选择图片
-			const that = this
-		    that.$api.uploadImg((res => {
-				item.imgs.push(res)
-			}))
-		},
+		
 		previewImage() { //预览图片
 		    uni.previewImage({
 		        urls: this.imageList
 		    });
 		},
+		/* 弹窗相关start */
+		showShade : function () {
+			this.$refs.graceShade.showIt();
+		},
+		closeShade : function () {
+			this.$refs.graceShade.hideIt();
+		},
+		/* 弹窗相关end */
+		
+		/* 选择图片 */
+		chooseImg() { //选择图片
+			const that = this
+			that.$api.uploadImg((res => {
+				that.spu.img = res;
+			}))
+		},
 	},
-	components:{gracePage}
+	components:{gracePage,graceShade}
 }
 </script>
 <style>
@@ -288,4 +319,107 @@ export default {
 		height: 100%;
 		opacity: 0;
 	}
+	
+	
+	.grace-shade{
+		background: rgba(0, 0, 0, 0.5) !important;
+		z-index: 5 !important;
+	}
+	.addgoods-box{
+	    background: white !important;
+		width: 25.8rem;
+		height: 43.2rem;
+		margin-top: 2.8rem;
+	}
+	.my-form-item{
+		display: flex;
+		justify-content: space-around;
+		padding:10rpx;
+		align-items: center;
+		position: relative;
+		z-index: 6;
+	}
+	.my-form-label{
+		text-align: right;
+		width: 18%;
+		padding: 10rpx;
+	}
+	.my-form-label-start{
+		text-align: right;
+		width: 18%;
+		padding: 10rpx;
+		position:absolute;
+		top: 0;
+		left: 0;
+		z-index: 7;
+	}
+	
+	.my-form-input{
+		flex: 3;
+		border: 1px solid lightgray;
+		border-radius: 5px;
+		padding: 10rpx;
+	}
+	
+	.goods-add-icon{
+		font-size: 44px;
+		height: 44px;
+		line-height: 44px;
+		margin-bottom: 11px;
+		color: #999999;
+	}
+	.goods-imgbox{
+		position: relative;
+		background: lavender;
+		padding: 1rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		align-self: center;
+		border: 1px solid lightgray;
+		border-radius: 5px;
+		width: 70%;
+		right: 0;
+		left: 10%;
+	}
+	.goods-imgbox-icon{
+		position: absolute;
+		top: 6rem;
+		left: 37%;
+	}
+	.goods-msg-in{
+		    width: 100%;
+		    height: 240px;
+		    display: block;
+		    overflow: hidden;
+		    position: relative;
+		    margin: auto;
+			border-bottom: 1px solid lightgray;
+	}
+	
+	.category-box-title{
+		display: flex;
+		justify-content: center;
+		text-align: center;
+		align-items: center;
+		padding: 10px;
+		border: 1px solid lightgray;
+	}
+	
+	.skufooter{
+		position: fixed;
+		display: flex;justify-content: space-around;
+		text-align: center;
+		align-items: center;
+		border-top: 1px solid;
+		background: white !important;
+		bottom: 0;
+		right: 0;
+		left: 0;
+	}
+	.skufooter .btn{
+			width: 80%;
+			flex: 1;
+			background: #white !important;
+		}
 </style>
