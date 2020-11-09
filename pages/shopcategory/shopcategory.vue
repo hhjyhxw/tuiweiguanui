@@ -3,7 +3,7 @@
 		<view slot="gBody" class="grace-flex-v1" id="gBody">
 			<!-- 数据区域 -->
 			<view class="grace-cate-wrap grace-space-between">
-				<button @click="showShade" class="grace-cate-left-item" style="position: fixed;width: 110px;top: 43px;left:0;z-index: 2;display: flex;justify-content: center;align-items: center;border: 1px solid lightgray;">添加分类</button>
+				<button @click="showShade" class="grace-cate-left-item" style="position: fixed;width: 100px;top: 43px;left:0;z-index: 2;display: flex;justify-content: center;align-items: center;border: 1px solid lightgray;">添加分类</button>
 				<scroll-view scroll-y scroll-with-animation class="grace-cate-left grace-scroll-y" :style="{height:mainHeight+'px'}" :scroll-into-view="leftTo">
 					<view  :class="['category-item', currentCateIndex == index ? 'grace-cate-left-current' : '']" v-for="(item,index) in categorylist" :key="index">
 						<view class="category-name">{{item.title}}</view>
@@ -208,7 +208,7 @@ export default {
     }
     .appraise-uploader {
     	/* padding: 22upx 20upx; */
-		padding-left: 5px;
+		/* padding-left: 5px; */
     }
     .appraise-star {
     	font-family: uniicons;
@@ -261,7 +261,7 @@ export default {
 	}
 	.uni-uploader__file {
 		margin: 10upx;
-		width: 80px;
+		width: 73px;
 		height: 108px;
 	}
 	.uni-uploader-title{
@@ -338,6 +338,7 @@ export default {
 		align-items: center;
 		position: relative;
 		z-index: 6;
+		font-size: 12px;
 	}
 	.my-form-label{
 		text-align: right;
@@ -359,6 +360,7 @@ export default {
 		border: 1px solid lightgray;
 		border-radius: 5px;
 		padding: 10rpx;
+		margin-right: 22px;
 	}
 	
 	.goods-add-icon{
@@ -378,9 +380,9 @@ export default {
 		align-self: center;
 		border: 1px solid lightgray;
 		border-radius: 5px;
-		width: 70%;
+		width: 65%;
 		right: 0;
-		left: 10%;
+		left: 8%;
 	}
 	.goods-imgbox-icon{
 		position: absolute;
@@ -413,7 +415,7 @@ export default {
 		align-items: center;
 		border-top: 1px solid;
 		background: white !important;
-		bottom: 0;
+		bottom: 2.2rem;
 		right: 0;
 		left: 0;
 	}

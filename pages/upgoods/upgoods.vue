@@ -311,7 +311,8 @@ export default {
 }
 
 .grace-shade{
-	background: rgba(0, 0, 0, 0.5) !important
+	background: rgba(0, 0, 0, 0.5) !important;
+	/* width: 85% !important; */
 }
 .addgoods-box{
     z-index: 2;
@@ -351,6 +352,7 @@ export default {
 	align-items: center;
 	padding: 1rem;
 	background-color: white;
+	padding-top: 0px;
 }
 .goods-tab{
 	display: flex;
@@ -360,6 +362,8 @@ export default {
 	background-color: white;
 	border-top:1px solid lightgrey;
 	border-bottom:1px solid lightgrey;
+	text-align: center;
+	
 }
 .uni-list-cell-db{
 	flex: 1;
@@ -383,6 +387,8 @@ export default {
 .skulist{
 	display: flex;
 	flex-direction: column;
+	padding: 0 	25px;
+	font-size: 12px;
 }
 .skuitem{
 	    display: flex;
@@ -402,6 +408,10 @@ export default {
 	height: 2rem;
 	line-height: 2rem;
 }
+
+.release-content{
+	padding: 10px 25px;
+}
 .skufooter{
 	position: fixed;
 	display: flex;justify-content: space-around;
@@ -409,7 +419,7 @@ export default {
 	align-items: center;
 	border-top: 1px solid;
 	background: white !important;
-	bottom: 0;
+	 bottom: 2.2rem;
 	right: 0;
 	left: 0;
 	
