@@ -149,11 +149,12 @@
         }
         ,{
             "path" : "pages/shopcoupon/shopcoupon",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
-            }
+           "style" : {
+           		"titleNView" : false,
+           		"bounce" : "none",
+           		"scrollIndicator" : "none",
+           		"navigationStyle" : "custom"
+           	}
             
         }
     ],

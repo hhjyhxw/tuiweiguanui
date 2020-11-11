@@ -412,6 +412,7 @@ export default {
 .release-content{
 	padding: 10px 25px;
 }
+
 .skufooter{
 	position: fixed;
 	display: flex;justify-content: space-around;

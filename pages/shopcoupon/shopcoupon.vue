@@ -1,5 +1,13 @@
 <template>
-	<gracePage :customHeader="false">
+	
+	<gracePage :customHeader="true" :bounding="false">
+		<view class="grace-header-body" slot="gHeader">
+			<view class="myhearder">
+				<image class="myhearder-goback" src="../../static/goback.png" @click="goback"></image>
+				<text class="myhearder-text">优惠券</text>
+				<image class="myhearder-add" src="../../static/add.png" @click="showShade"></image>
+			</view>	
+		</view>
 		<!-- 页面主体 -->
 		<view slot="gBody">
 			<view class="grace-nowrap grace-flex-vcenter grace-border-b" 
@@ -26,6 +34,100 @@
 					<button type="default" class="btngroup-btn" size=""  @click="todel($event,index)">删除</button>
 				</view>
 			</view>
+			
+			
+			<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
+			<graceShade @closeShade="closeShade" ref="graceShade">
+				<view class="addgoods-box grace-relative" @tap.stop="">
+					<view class="tan-box-titile">优惠券</view>
+					<form class="grace-form">
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">优惠券名称</text>
+									<view class="grace-form-body">
+										<input type="text" class="grace-form-input" name="name1" placeholder="请输入优惠券名称" />
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">使用限制</text>
+									<view class="grace-form-body" style="padding:20rpx 0;">
+										<radio-group name="danxuan">
+											<label class="grace-check-item-v"><radio value="1"></radio>新用户</label>
+											<label class="grace-check-item-v"><radio value="2"></radio>不限</label>
+										</radio-group>
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">优惠券类型</text>
+									<view class="grace-form-body" style="padding:20rpx 0;">
+										<radio-group name="danxuan">
+											<label class="grace-check-item-v"><radio value="1"></radio>满减券</label>
+											<label class="grace-check-item-v"><radio value="2"></radio>折扣券</label>
+										</radio-group>
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">每人限领</text>
+									<view class="grace-form-body">
+										<input type="number" class="grace-form-input" name="name1" placeholder="每人限领" />
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">投放数量</text>
+									<view class="grace-form-body">
+										<input type="number" class="grace-form-input" name="name1" placeholder="请输入投放数量" />
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">最低消费</text>
+									<view class="grace-form-body">
+										<input type="number" class="grace-form-input" name="name1" placeholder="请输入最低消费" />
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">优惠金额</text>
+									<view class="grace-form-body">
+										<input type="number" class="grace-form-input" name="name1" placeholder="请输优惠金额" />
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">使用对象</text>
+									<view class="grace-form-body">
+										<picker class="grace-form-picker" @change="bindPickerChange" :value="genderIndex" :range="gender" name="gender">
+											<text class="grace-text">{{gender[genderIndex]}}</text>
+											<text class="grace-icons icon-arrow-down" style="margin-left:5px;"></text>
+										</picker>
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">开始日期</text>
+									<view class="grace-form-body">
+										<graceDateTime @confirm="confirm1" :value="demo1Val" @change="chang1">
+											<text class="demo grace-border-radius">{{demo1Val}}<text class="grace-icons icon-date icon-left-margin"></text></text>
+										</graceDateTime>
+									</view>
+								</view>
+								<view class="grace-form-item grace-border-b">
+									<text class="grace-form-label">结束日期</text>
+									<view class="grace-form-body">
+										<graceDateTime @confirm="confirm2" :value="demo2Val" @change="chang1">
+											<text class="demo grace-border-radius">{{demo2Val}}<text class="grace-icons icon-date icon-left-margin"></text></text>
+										</graceDateTime>
+									</view>
+								</view>
+														
+								<view class="grace-form-item">
+									<text class="grace-form-label">详情</text>
+									<view class="grace-form-body" style="padding:20rpx 0;">
+										<textarea class="grace-textarea" value="" placeholder="详情" />
+									</view>
+								</view>
+							</form>
+					<view class="skufooter">
+						<button class="btn"  @tap.stop="closeShade">关闭</button>
+						<button class="btn" @tap="save">保存</button>
+					</view>
+				</view>
+			</graceShade>
 		</view>
 	</gracePage>
 </template>
@@ -33,6 +135,8 @@
 import gracePage from "../../graceUI/components/gracePage.vue";
 import graceSelectMenu from "../../graceUI/components/graceSelectMenu.vue";
 import graceCoupons from "../../graceUI/components/graceShopCoupons.vue";
+import graceShade from "../../graceUI/components/graceShade.vue";
+import graceDateTime from "../../graceUI/components/graceDateTime.vue";
 export default {
 	data(){
 		return {
@@ -69,15 +173,20 @@ export default {
 			endY: 0,
 			status: false,
 			isshowbtn:false,
+			gender : ['选择使用对象', '男', '女'],
+			demo1Val:"请选择具体时间",
+			demo2Val:"请选择具体日期",
+			
 		}
 	},
 	onLoad : function () {
 		
 	},
 	components:{
-		gracePage, graceSelectMenu,graceCoupons
+		gracePage, graceSelectMenu,graceCoupons,graceShade,graceDateTime
 	},
 	methods:{
+		goback : function () { uni.navigateBack({}); },
 		showMenu1  : function () {this.show1 = true;},
 		closeMenu1 : function () {this.show1 = false;},
 		select1    : function (index) {
@@ -185,10 +294,44 @@ export default {
 				event.stopPropagation();
 				
 			},
+			/* 弹窗相关start */
+			showShade : function () {
+				this.$refs.graceShade.showIt();
+			},
+			closeShade : function () {
+				this.$refs.graceShade.hideIt();
+			},
+			chang1:function (e) {
+				console.log(e);
+			},
+			confirm1:function (res) {
+				this.demo1Val = res[0]+'-'+res[1]+'-'+res[2]+' '+res[3]+':'+res[4]+':'+res[5];
+			},
+			confirm2:function (res) {
+				this.demo2Val = res[0]+'-'+res[1]+'-'+res[2]+' '+res[3]+':'+res[4]+':'+res[5];
+			}
 	}
 }
 </script>
 <style>
+	.myhearder{
+		display: flex;
+		padding: 0.5rem;
+		justify-content:space-between;
+		align-items: center;
+		width: 100%;
+	}
+	.myhearder-goback{
+		height: 1.5rem;
+		width: 1.5rem;
+	}
+	.myhearder-add{
+		height: 2rem;
+		width: 2rem;
+		display: block;
+		position: relative;
+		right: 0px;
+	}
 .graceSelectMenuItem{width:200rpx; line-height:90rpx;}
 
 .shopcoupon{
@@ -206,4 +349,58 @@ export default {
 	    line-height: 1.5rem;
 	    font-size: 12px;
 }
+
+.grace-shade{
+	background: rgba(0, 0, 0, 0.5) !important;
+	/* width: 85% !important; */
+}
+.addgoods-box{
+    z-index: 2;
+    background: white !important;
+    /* width: 25.8rem; */
+    height: 43.2rem;
+    width: 82%;
+    margin: auto;
+	overflow: auto;
+	/* margin-top: 2.8rem; */
+}
+.tan-box-titile{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    padding: 0.8rem;
+    -webkit-justify-content: space-around;
+    justify-content: space-around;
+    border-bottom: 1px solid lightgray;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    padding-top: 1.3rem;
+}
+.grace-form-item{
+	padding: 0px 3rem !important;
+}
+.grace-form-label{
+	height: 41px !important;
+	line-height: 41px !important;
+}
+.skufooter{
+	position: fixed;
+	display: flex;justify-content: space-around;
+	text-align: center;
+	align-items: center;
+	border-top: 1px solid;
+	background: white !important;
+	 bottom: 2.2rem;
+	right: 0;
+	left: 0;
+	
+	
+}
+.skufooter .btn{
+		width: 80%;
+		flex: 1;
+		background: #white !important;
+	}
+
 </style>
