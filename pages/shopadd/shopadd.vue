@@ -4,7 +4,7 @@
 		<view class="grace-header-body" slot="gHeader">
 			<view class="myhearder">
 				<image class="myhearder-goback" src="../../static/goback.png" @click="goback"></image>
-				<text class="myhearder-text">优惠券</text>
+				<text class="myhearder-text">广告维护</text>
 				<image class="myhearder-add" src="../../static/add.png" @click="showShade"></image>
 			</view>	
 		</view>
@@ -23,9 +23,8 @@
 					@showMenu="showMenu2" @close="closeMenu2" @select="select2"></graceSelectMenu>
 				</view>
 			</view>
-			
-			<view class="shopcoupon" v-for="(item, index) in coupons" :key="index" :data-index="index" :data-number="item.number" :data-btn="item.btn" style="margin:15px 0;" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
-				<graceCoupons :coupon="item"></graceCoupons>
+			<view  class="shopcoupon" v-for="(item,index) in adslist" :key="index" :data-index="index" :data-number="item.number" :data-btn="item.btn" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
+				<image :src="item.img" style="width: 100%;height: 8rem;"></image>
 				<view class="btngroup" v-show="item.isshowbtn">
 					<button type="default" class="btngroup-btn" size="" @click="upone($event,index)">向上</button>
 					<button type="default" class="btngroup-btn" size="" @click="downone($event,index)">向下</button>
@@ -34,6 +33,16 @@
 					<button type="default" class="btngroup-btn" size=""  @click="todel($event,index)">删除</button>
 				</view>
 			</view>
+		<!-- 	<view class="shopcoupon" v-for="(item, index) in coupons" :key="index" :data-index="index" :data-number="item.number" :data-btn="item.btn" style="margin:15px 0;" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
+				<graceCoupons :coupon="item"></graceCoupons>
+				<view class="btngroup" v-show="item.isshowbtn">
+					<button type="default" class="btngroup-btn" size="" @click="upone($event,index)">向上</button>
+					<button type="default" class="btngroup-btn" size="" @click="downone($event,index)">向下</button>
+					<button type="default" class="btngroup-btn" size=""  @click="toupdatestatus($event,index)">开启</button>
+					<button type="default" class="btngroup-btn" size=""  @click="toedite($event,index)">编辑</button>
+					<button type="default" class="btngroup-btn" size=""  @click="todel($event,index)">删除</button>
+				</view>
+			</view> -->
 			
 			
 			<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
@@ -165,6 +174,7 @@ export default {
 					btn : "领券","isshowbtn":false
 				}
 			],
+			adslist:[{id:1,title:'',img:'../../static/missing-face.png',isshowbtn:false},{id:2,title:'',img:'../../static/missing-face.png',isshowbtn:false}],
 			
 			/* 移动所需参数 */
 			startX: 0,
@@ -177,6 +187,7 @@ export default {
 			genderIndex : 0,
 			demo1Val:"请选择具体时间",
 			demo2Val:"请选择具体日期",
+			
 			
 		}
 	},
@@ -233,12 +244,12 @@ export default {
 						//向右
 						console.log('向右');
 						var index = e.currentTarget.dataset.index;
-						this.coupons[index].isshowbtn=false;
+						this.adslist[index].isshowbtn=false;
 					} else if (X < 0 && Math.abs(X) > Math.abs(Y)) {
 						//向左
 						this.isshowbtn = true;
 						var index = e.currentTarget.dataset.index;
-						this.coupons[index].isshowbtn=true;
+						this.adslist[index].isshowbtn=true;
 						console.log('向左');
 					} else if (Y > 0 && Math.abs(Y) > Math.abs(X)) {
 						//向下
@@ -261,24 +272,24 @@ export default {
 				if(index==0){
 					return;
 				}
-				var temp = this.coupons[index];
+				var temp = this.adslist[index];
 				temp.isshowbtn=false;
-				this.coupons[index]=this.coupons[index-1];
-				this.coupons[index].isshowbtn	 = false;
-				this.coupons[index-1]=temp;
+				this.adslist[index]=this.adslist[index-1];
+				this.adslist[index].isshowbtn	 = false;
+				this.adslist[index-1]=temp;
 			},
 			//往下移动
 			downone(event,index){
 				event.stopPropagation();
 				console.log("index==="+index)
-				if(index==this.coupons.length-1){
+				if(index==this.adslist.length-1){
 					return;
 				}
-				var temp = this.coupons[index];
+				var temp = this.adslist[index];
 				temp.isshowbtn=false;
-				this.coupons[index]=this.coupons[index+1];
-				this.coupons[index].isshowbtn = false;
-				this.coupons[index+1]=temp;
+				this.adslist[index]=this.adslist[index+1];
+				this.adslist[index].isshowbtn = false;
+				this.adslist[index+1]=temp;
 			},
 			//去编辑
 			toedite(event,index){
@@ -342,6 +353,7 @@ export default {
 	position: absolute;
 	top: 0;
 	right: 0;
+	z-index: 2;
 }
 .btngroup-btn{
 	    width: 3.5rem;

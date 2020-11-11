@@ -124,7 +124,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/font.png', 
 					txt:'广告管理', smallTxt:"", bgColor:"#DCD64E",
-					path:"../index/index?test=1", openType:"switchTab"
+					path:"/pages/shopadd/shopadd", openType:"navigate"
 				},
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/tmp.png', 

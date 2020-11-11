@@ -157,6 +157,16 @@
            	}
             
         }
+        ,{
+            "path" : "pages/shopadd/shopadd",
+           "style" : {
+           		"titleNView" : false,
+           		"bounce" : "none",
+           		"scrollIndicator" : "none",
+           		"navigationStyle" : "custom"
+           	}
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
