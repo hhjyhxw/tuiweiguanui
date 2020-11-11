@@ -19,11 +19,11 @@
 			<view class="shopcoupon" v-for="(item, index) in coupons" :key="index" :data-index="index" :data-number="item.number" :data-btn="item.btn" style="margin:15px 0;" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
 				<graceCoupons :coupon="item"></graceCoupons>
 				<view class="btngroup" v-show="item.isshowbtn">
-					<button type="default" class="btngroup-btn" size="">向上</button>
-					<button type="default" class="btngroup-btn" size="">向下</button>
-					<button type="default" class="btngroup-btn" size="">开启</button>
-					<button type="default" class="btngroup-btn" size="">编辑</button>
-					<button type="default" class="btngroup-btn" size="">删除</button>
+					<button type="default" class="btngroup-btn" size="" @click="upone($event,index)">向上</button>
+					<button type="default" class="btngroup-btn" size="" @click="downone($event,index)">向下</button>
+					<button type="default" class="btngroup-btn" size=""  @click="toupdatestatus($event,index)">开启</button>
+					<button type="default" class="btngroup-btn" size=""  @click="toedite($event,index)">编辑</button>
+					<button type="default" class="btngroup-btn" size=""  @click="todel($event,index)">删除</button>
 				</view>
 			</view>
 		</view>
@@ -143,6 +143,47 @@ export default {
 				} else {
 					console.log('没有');
 				}
+			},
+			//往上移动
+			upone(event,index){
+				event.stopPropagation();
+				console.log("index==="+index)
+				if(index==0){
+					return;
+				}
+				var temp = this.coupons[index];
+				temp.isshowbtn=false;
+				this.coupons[index]=this.coupons[index-1];
+				this.coupons[index].isshowbtn	 = false;
+				this.coupons[index-1]=temp;
+			},
+			//往下移动
+			downone(event,index){
+				event.stopPropagation();
+				console.log("index==="+index)
+				if(index==this.coupons.length-1){
+					return;
+				}
+				var temp = this.coupons[index];
+				temp.isshowbtn=false;
+				this.coupons[index]=this.coupons[index+1];
+				this.coupons[index].isshowbtn = false;
+				this.coupons[index+1]=temp;
+			},
+			//去编辑
+			toedite(event,index){
+				event.stopPropagation();
+				
+			},
+			//去开启或者关闭
+			toupdatestatus(event,index){
+				event.stopPropagation();
+				
+			},
+			//去删除
+			todel(event,index){
+				event.stopPropagation();
+				
 			},
 	}
 }
