@@ -146,7 +146,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/tmp.png', 
 					txt:'资金提现', smallTxt:"", bgColor:"#C4A6FB",
-					path:"./index?test=1", openType:"navigate"
+					path:"/pages/shopwithdraw/shopwithdraw", openType:"navigate"
 				},
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',
