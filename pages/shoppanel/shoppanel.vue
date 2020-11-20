@@ -141,7 +141,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/font.png', 
 					txt:'资金明细', smallTxt:"", bgColor:"#DCD64E",
-					path:"../index/index?test=1", openType:"switchTab"
+					path:"/pages/shopwithdraw/shopcash-list", openType:"navigate"
 				},
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/tmp.png', 

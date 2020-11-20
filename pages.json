@@ -211,6 +211,15 @@
 		        "enablePullDownRefresh": false
 		    }
 		    
+		},
+		{
+		    "path" : "pages/shopwithdraw/shopcash-list",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "",
+		        "enablePullDownRefresh": false
+		    }
+		    
 		}
 		
     ],
