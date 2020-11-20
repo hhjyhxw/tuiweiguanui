@@ -87,7 +87,7 @@
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">交易状态</view>
-							<view class="ls-form-input-box">交易完成</view>
+							<view class="ls-form-input-box ls-cl-purple">交易完成</view>
 						</view>
 						<view class="ls-btn-box">
 							<button class="ls-btn ls-btn-blue" @tap.stop="closeShade">关闭</button>
@@ -195,7 +195,7 @@
 	.ls-form{
 		padding:3px;
 		background-color: white;
-		margin-top: 10px;
+		margin-top: 45px;
 		border-radius: 5px;
 		padding-bottom: 10px;
 	}
@@ -213,6 +213,11 @@
 	}
 	.ls-form-input-box{
 		flex: 3;
+		text-align: right;
+		padding-right: 15px;
+	}
+	.ls-cl-purple{
+		color: purple;
 	}
 	.ls-btn-box{
 		margin-top: 5rem;
