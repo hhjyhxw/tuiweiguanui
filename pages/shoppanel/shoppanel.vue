@@ -95,7 +95,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/tmp.png', 
 					txt:'历史订单', smallTxt:"", bgColor:"#F596DB",
-					path:"./index?test=1", openType:"navigate"
+					path:"/pages/shoptoday_order/shophistory_order", openType:"navigate"
 				},
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',
@@ -151,7 +151,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',
 					txt:'银行卡', smallTxt:"", bgColor:"#C4A6FB",
-					path:"./index?test=1", openType:"navigate"
+					path:"/pages/shopbankcard/shopbankcard", openType:"navigate"
 				},
 			],
 			shopclasses : [
