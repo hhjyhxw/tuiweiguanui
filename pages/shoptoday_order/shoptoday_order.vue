@@ -15,7 +15,7 @@
 				<view class="order">
 					<view class="order-top-info">
 						<view class="order-user-info">
-							<view class="user-img" src="https://staticimgs.oss-cn-beijing.aliyuncs.com/empty.png"></view>
+							<image class="user-img" src="/static/yonghu.png"></image>
 							<view class="user-text">
 								<view class="nickname">阿木木</view>
 								<view class="phone">15077144027</view>
@@ -57,6 +57,8 @@ import { mapState } from 'vuex';
 				},
 				totalAmount:0,//总下单金额
 				accordionActive: "grace-accordion-1",
+				
+				current : 0,
 				tabs: ['全部','已支付','已完成','未支付'],
 			}
 			
@@ -166,28 +168,47 @@ import { mapState } from 'vuex';
 /* 订单列表样式 */
 .order-list{
 	display: flex;
+	background-color: #F0FFF0;
+	width: 100%;
+	margin-top: 0.2rem;
+	color: #4876FF;
 }
 .order{
 	display: flex;
 	flex-direction: column;
-}
-.order{
-	display: flex;
-	flex-direction: column;
+	width: 100%;
+	background-color: ligh;
 }
 .order-top-info{
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
+	padding: 0.1rem;
+	align-items: center;
 }
 .order-user-info{
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-around;
+	align-items: center;
 }
 .user-img{
-	width: 2rem;
-	height: 2rem;
+	width: 3rem;
+	height: 3rem;
+	border-radius: 50%;
+}
+.user-text{
+	padding: 1rem;
+}
+.border-bottom-info{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem;
+}
+.seek-order{
+	color: rgba(45, 89, 218, 0.51);
 }
 
 </style>
