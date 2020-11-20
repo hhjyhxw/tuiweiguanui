@@ -149,6 +149,11 @@ export default {
 					path:"/pages/shopwithdraw/shopwithdraw", openType:"navigate"
 				},
 				{
+					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/tmp.png', 
+					txt:'提现记录', smallTxt:"", bgColor:"#C4A6FB",
+					path:"/pages/shopwithdraw/shopwithdraw-list", openType:"navigate"
+				},
+				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',
 					txt:'银行卡', smallTxt:"", bgColor:"#C4A6FB",
 					path:"/pages/shopbankcard/shopbankcard", openType:"navigate"

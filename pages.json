@@ -202,7 +202,17 @@
                 "enablePullDownRefresh": false
             }
             
-        }
+        },
+		{
+		    "path" : "pages/shopwithdraw/shopwithdraw-list",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		}
+		
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
