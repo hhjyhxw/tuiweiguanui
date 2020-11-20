@@ -99,8 +99,13 @@ export default {
 				},
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',
-					txt:'统计报表', smallTxt:"", bgColor:"#F596DB",
-					path:"./index?test=1", openType:"navigate"
+					txt:'商品日报', smallTxt:"", bgColor:"#F596DB",
+					path:"/pages/shopreport/shop-gooodsday-report", openType:"navigate"
+				},
+				{
+					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',
+					txt:'订单日报', smallTxt:"", bgColor:"#F596DB",
+					path:"/pages/shopreport/shop-orderday-report", openType:"navigate"
 				},
 			],
 			goodsclasses:[

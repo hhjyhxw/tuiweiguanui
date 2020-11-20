@@ -189,7 +189,7 @@
             "path" : "pages/shopbankcard/shopbankcard",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
+                "navigationBarTitleText": "银行卡",
                 "enablePullDownRefresh": false
             }
             
@@ -198,7 +198,7 @@
             "path" : "pages/shopwithdraw/shopwithdraw",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
+                "navigationBarTitleText": "提现",
                 "enablePullDownRefresh": false
             }
             
@@ -207,7 +207,7 @@
 		    "path" : "pages/shopwithdraw/shopwithdraw-list",
 		    "style" :                                                                                    
 		    {
-		        "navigationBarTitleText": "",
+		        "navigationBarTitleText": "提现记录",
 		        "enablePullDownRefresh": false
 		    }
 		    
@@ -216,7 +216,35 @@
 		    "path" : "pages/shopwithdraw/shopcash-list",
 		    "style" :                                                                                    
 		    {
-		        "navigationBarTitleText": "",
+		        "navigationBarTitleText": "资金明细",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		}
+		
+        ,{
+            "path" : "pages/shopreport/shopreport",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+		,{
+		    "path" : "pages/shopreport/shop-gooodsday-report",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "商品日报",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		}
+		,{
+		    "path" : "pages/shopreport/shop-orderday-report",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "订单日报",
 		        "enablePullDownRefresh": false
 		    }
 		    
