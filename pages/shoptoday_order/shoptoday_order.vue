@@ -60,6 +60,7 @@
 					<!-- 订单详情列表end -->
 				</view>
 					<!-- 订单信息end -->
+				
 			</view>
 		</view>
 	</gracePage>
@@ -223,7 +224,7 @@ import { mapState } from 'vuex';
 	flex-direction: column;
 	width: 100%;
 	background-color: white;
-	margin-bottom: 0.2rem;
+	/* margin-bottom: 0.2rem; */
 }
 .order-top-info{
 	display: flex;
@@ -252,6 +253,9 @@ import { mapState } from 'vuex';
 .order-pay-info .money{
 	color: blue;
 }
+.ordertime{
+	color: black;
+}
 .border-bottom-info{
 	display: flex;
 	flex-direction: row;
@@ -260,6 +264,7 @@ import { mapState } from 'vuex';
 	padding: 0.5rem;
 	font-size: 0.7rem;
 	overflow: hidden;
+	border-bottom: 1px solid lightgray;
 }
 .seek-order{
 	color: red;
@@ -272,8 +277,8 @@ import { mapState } from 'vuex';
 	justify-content: space-around;
 	align-items: center;
 	padding: 1rem 0.5rem;
-	border-top: 1px solid #F5F5F5;
-	border-bottom: 1px solid #F5F5F5;
+	/* border-top: 1px solid #F5F5F5; */
+	border-bottom: 1px solid lightgray;
 	margin: 0.1rem 0.3rem;
 	background-color: white;
 	color: black;
