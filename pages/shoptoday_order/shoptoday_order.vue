@@ -12,6 +12,7 @@
 				<text slot="text" class="grace-text-small grace-gray"  v-show="!hasdata">抱歉，暂时没有数据</text>
 			</graceEmptyNew>
 			<view class="order-list" v-show="hasdata">
+				<!-- 订单信息start -->
 				<view class="order">
 					<view class="order-top-info">
 						<view class="order-user-info">
@@ -27,12 +28,38 @@
 						</view>
 					</view>
 					<view class="border-bottom-info">
-						<view class="orderno">DD58ki933kka20903893</view>
+						<view class="orderno">1298437818426724352</view>
 						<view class="ordertime">2020-11-20 21:25:20</view>
-						<view class="seek-order">查看</view>
+						<view class="seek-order" @click="showorHide">查看</view>
 					</view>
+					<!-- 订单详情列表 -->
+					<view  :class="['order-detail-list', show==true ? 'grace-accordion-show' : 'grace-accordion-hide']">
+						<image class="goods-img" src="../../static/jian.png"></image>
+						<view class="goods-info">
+							<view class="goods-name">【蔬菜】约500g/份</view>
+							<view class="price-amount">
+								<view class="price">￥2.5</view>
+								<view class="num">2份</view>
+							</view>
+						</view>
+						<view class="total-amount">￥5</view>
+					</view>
+					<!-- 订单详情列表end -->
+					<!-- 订单详情列表 -->
+					<view  :class="['order-detail-list', show==true ? 'grace-accordion-show' : 'grace-accordion-hide']">
+						<image class="goods-img" src="../../static/jian.png"></image>
+						<view class="goods-info">
+							<view class="goods-name">【蔬菜】约500g/份</view>
+							<view class="price-amount">
+								<view class="price">￥2.5</view>
+								<view class="num">2份</view>
+							</view>
+						</view>
+						<view class="total-amount">￥5</view>
+					</view>
+					<!-- 订单详情列表end -->
 				</view>
-				
+					<!-- 订单信息end -->
 			</view>
 		</view>
 	</gracePage>
@@ -60,6 +87,7 @@ import { mapState } from 'vuex';
 				
 				current : 0,
 				tabs: ['全部','已支付','已完成','未支付'],
+				show:false,
 			}
 			
 		},
@@ -90,6 +118,22 @@ import { mapState } from 'vuex';
 		methods: {
 			init(){
 				
+			},
+			// showorHide(item0,index0){
+			// 	if(item0.show==true){
+			// 		// item0.show = false;
+			// 		this.orderlist[index0].show=false;
+			// 	}else{
+			// 		// item.show = true;
+			// 		this.orderlist[index0].show=true;
+			// 	}
+			// },
+			showorHide(){
+				if(this.show==true){
+					this.show=false;
+				}else{
+					this.show=true;
+				}
 			},
 			getTotalAmount(){
 				const that = this
@@ -168,16 +212,18 @@ import { mapState } from 'vuex';
 /* 订单列表样式 */
 .order-list{
 	display: flex;
-	background-color: #F0FFF0;
+	flex-direction: column;
+	background-color: #EDEDED;
 	width: 100%;
 	margin-top: 0.2rem;
-	color: #4876FF;
+	color: lightblue;
 }
 .order{
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-	background-color: ligh;
+	background-color: white;
+	margin-bottom: 0.2rem;
 }
 .order-top-info{
 	display: flex;
@@ -200,15 +246,83 @@ import { mapState } from 'vuex';
 .user-text{
 	padding: 1rem;
 }
+.order-pay-info{
+	
+}
+.order-pay-info .money{
+	color: blue;
+}
 .border-bottom-info{
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0.5rem;
+	font-size: 0.7rem;
+	overflow: hidden;
 }
 .seek-order{
-	color: rgba(45, 89, 218, 0.51);
+	color: red;
+	font-size: 0.8rem;
+	
 }
 
+.order-detail-list{
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	padding: 1rem 0.5rem;
+	border-top: 1px solid #F5F5F5;
+	border-bottom: 1px solid #F5F5F5;
+	margin: 0.1rem 0.3rem;
+	background-color: white;
+	color: black;
+	.goods-img{
+			height: 3.5rem;
+			width: 3.5rem;
+		}
+		.goods-info{
+			display: flex;
+			flex-direction:column ;
+			justify-content: space-around;
+			flex: 1;
+			text-align: center;
+			padding: 0.2rem;
+			.goods-name{
+				/* padding-left: 1rem;
+				text-align: left; */
+				font-weight:bold;
+			}
+			.price-amount{
+				display: flex;
+				justify-content: space-around;
+				flex-direction:row ;
+				.price{
+					font-size: 0.8rem;
+					color: 	#90EE90;
+					padding: 0.1rem 0.3rem;
+				}
+				.num{
+					font-size: 0.8rem;
+					color: 	#FFD700;
+					padding: 0.1rem 0.3rem;
+	
+				}
+				
+			}
+			.total-amount{
+				font-size: 0.8rem;
+				color: 	red;
+				padding: 0.1rem 0.3rem;
+				
+			}
+		}
+		.add{
+			margin: 0.1rem 1rem;
+		}
+}
+
+@import "../../graceUI/animate.css";
+.grace-accordion-show{height:auto; animation:fadeIn 300ms linear;visibility:visible;padding: 1rem 0rem; }
+.grace-accordion-hide{height:0; animation:fadeOut 300ms linear;visibility:hidden;padding:0;}
 </style>
