@@ -90,7 +90,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/font.png', 
 					txt:'今日订单', smallTxt:"", bgColor:"#6DCD70",
-					path:"../index/index?test=1", openType:"switchTab"
+					path:"/pages/shoptoday_order/shoptoday_order", openType:"navigate"
 				},
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/tmp.png', 

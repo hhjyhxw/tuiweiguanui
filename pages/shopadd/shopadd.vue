@@ -174,7 +174,7 @@ export default {
 					btn : "领券","isshowbtn":false
 				}
 			],
-			adslist:[{id:1,title:'',img:'../../static/missing-face.png',isshowbtn:false},{id:2,title:'',img:'../../static/missing-face.png',isshowbtn:false}],
+			adslist:[{id:1,title:'',img:'../../static/temp/baner1.jpg',isshowbtn:false},{id:2,title:'',img:'../../static/missing-face.png',isshowbtn:false}],
 			
 			/* 移动所需参数 */
 			startX: 0,

@@ -167,6 +167,15 @@
            	}
             
         }
+        ,{
+            "path" : "pages/shoptoday_order/shoptoday_order",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
