@@ -45,6 +45,15 @@
 				<!--  -->
 				<view class="ucenter-line"></view>
 				<view class="grace-list grace-margin-top">
+					<view class="grace-list-items" @click="navigo('/pages/shoppanel/shoppanel')">
+						<text class="grace-list-icon grace-icons icon-article grace-blue-sky"></text>
+						<view class="grace-list-body grace-border-b">
+							<view class="grace-list-title">
+								<text class="grace-list-title-text">功能面板</text>
+							</view>
+						</view>
+						<text class="grace-list-arrow-right grace-icons icon-arrow-right"></text>
+					</view>
 						<view class="grace-list-items">
 							<text class="grace-list-icon grace-icons icon-article grace-blue-sky"></text>
 							<view class="grace-list-body grace-border-b">
@@ -126,7 +135,11 @@ import graceShade from "../../graceUI/components/graceShade.vue";
 			...mapState(['hasLogin','userInfo'])
 		},
 		methods: {
-			
+			navigo(url){
+				uni.navigateTo({
+					url: url
+				})
+			},
 			//店铺功能面板
 			topanel(){
 				const that = this;

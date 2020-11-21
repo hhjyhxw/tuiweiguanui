@@ -3,9 +3,9 @@
 		<view slot="gBody" class="grace-body"  >
 			<view class="content">
 				<view class="ls-grid-3">
-					<view class="ls-cell"><<</view>
+					<view class="ls-cell">《</view>
 					<view class="ls-cell ls-cell-rborder ls-cell-lborder">2020年10月1日</view>
-					<view class="ls-cell">>></view>
+					<view class="ls-cell">》</view>
 				</view>
 				<view class="ls-grid-3">
 					<view class="ls-cell">商品名称</view>

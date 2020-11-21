@@ -38,7 +38,7 @@
 			</view>
 			<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
 			<graceShade @closeShade="closeShade" ref="graceShade">
-				<view class="addgoods-box grace-relative" @tap.stop="">
+				<view class="addgoods-box addgoods-box-margintop grace-relative" @tap.stop="">
 					<view class="category-box-title">{{selectcategorytitle}}</view>
 					<view class="my-form-item">
 						<text class="my-form-label">分类名称</text>
@@ -329,8 +329,12 @@ export default {
 	    background: white !important;
 		width: 25.8rem;
 		height: 43.2rem;
+	}
+	#ifndef H5
+	.addgoods-box-margintop{
 		margin-top: 2.8rem;
 	}
+	#endif
 	.my-form-item{
 		display: flex;
 		justify-content: space-around;
