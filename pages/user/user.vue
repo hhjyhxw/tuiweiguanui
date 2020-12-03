@@ -4,10 +4,10 @@
 		<view class="user-section">
 			<view class="user-info-box">
 				<view class="portrait-box">
-					<image class="portrait" :src="userInfo.headimgurl || '/static/missing-face.png'"></image>
+					<image class="portrait" :src="user.headimgurl || '/static/missing-face.png'"></image>
 				</view>
 				<view class="info-box">
-					<text @click="toLogin" class="username">{{ hasLogin? (userInfo.nickname || '未设置昵称') : '立即登录' }}</text>
+					<text @click="toLogin" class="username">{{ user.nickname? (user.nickname || '未设置昵称') : '立即登录' }}</text>
 				</view>
 			</view>
 		</view>
@@ -75,6 +75,28 @@
 		</view>
 			
 		
+		 <view v-if="isbind==0"  id="bgbox" class="bgbox">
+		        <view class="contentbox">
+		            <view class="ls-form"  style="margin-top:4.5rem;">
+							<image src="../../static/x.png" class="ls-close-btn" @click="closewin"></image>
+							<view class="ls-form-item">
+							    <view class="ls-form-label">店铺编号</view>
+							    <view class="ls-form-input-box"><input id="pwd" v-model="shopman.shopCode" class="ls-form-input"/></view>
+							</view>
+		                    <view class="ls-form-item">
+		                        <view class="ls-form-label">账号</view>
+		                        <view class="ls-form-input-box"><input id="account" v-model="shopman.accountNo" class="ls-form-input"/></view>
+		                    </view>
+							<view class="ls-form-item">
+							    <view class="ls-form-label">密码</view>
+							    <view class="ls-form-input-box"><input id="pwd" v-model="shopman.pwd" class="ls-form-input"/></view>
+							</view>
+		                <view class="ls-btn-box">
+		                    <button class="ls-btn ls-btn-blue" @click.stop="gobind">绑定</button>
+		                </view>
+		            </view>
+		        </view>
+		    </view>
     </view>  
 	</gracePage>
 </template>
@@ -97,15 +119,27 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 				footprintList: [],
 				isVip: false,
 				shopId:null,
+				isbind:1, //用户是否的绑定该店铺店主
+				user:{
+					headimgurl:'',
+					nickname:''
+				},
+				shopman:{
+					accountNo:'',
+					pwd:'',
+					shopCode:''
+				}
 			}
 		},
 		onShow() {
 			this.isVip = this.$api.isVip()
+			this.userinfo();
 			// this.loadFootprint()
 		},
 		onLoad(option){
 			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
 			this.shopId = option.shopId;
+			this.userinfo();
 		},
 		// #ifndef MP
 		onNavigationBarButtonTap(e) {
@@ -155,6 +189,17 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 				})
 			},
 			//我的代金券
+			userinfo(){
+				var that = this;
+				that.$api.requestGet('user', 'info',failres => {
+						that.$api.msg(failres.msg)
+				}).then(res => {
+					if(res.code==0){
+						that.user = res.user;
+					}
+				});
+			},
+			//我的代金券
 			gotoMycoupon(){
 				const that = this;
 				uni.navigateTo({
@@ -164,9 +209,23 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 			//店铺中心
 			gotoShopcenter(){
 				const that = this;
-				uni.navigateTo({
-					url: '/pages/shopcenter/shopcenter?shopId='+that.shopId
-				})
+				let param ={
+					'shopId':that.shopId,
+				};
+				that.$api.requestGet('shopkeeper/shopcenter', 'checkShopkeeper',param,failres => {
+					if(failres.code==6000){
+						that.isbind = 0;
+					}else{
+						that.$api.msg(failres.msg)
+					}
+				}).then(res => {
+					if(res.code==0){
+						uni.navigateTo({
+							url: '/pages/shopcenter/shopcenter?shopId='+that.shopId
+						})
+					}
+				});
+				
 			},
 			toLogin() {
 				if (!this.hasLogin) {
@@ -187,6 +246,7 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 						if (e.confirm) {
 							that.$store.commit('logout')
 							that.$api.logout()
+							that.user=null
 						}
 					}
 				})
@@ -217,6 +277,45 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 				uni.navigateTo({
 					url
 				})
+			},
+			//关闭店主绑定弹窗
+			closewin(){
+				this.isbind=1;
+			},
+			//绑定店主
+			gobind(){
+				var that = this;
+				if(that.shopman.accountNo==null || that.shopman.accountNo==''){
+					that.$api.msg("账号不能为空")
+					return;
+				}
+				if(that.shopman.shopCode==null || that.shopman.shopCode==''){
+					that.$api.msg("店铺编号不能为空")
+					return;
+				}
+				if(that.shopman.pwd==null || that.shopman.pwd==''){
+					that.$api.msg("密码不能为空")
+					return;
+				}
+				that.$api.request('shopkeeper/shopcenter', 'shopmanBind',{
+					accountNo:that.shopman.accountNo,
+					pwd:that.shopman.pwd,
+					shopCode:that.shopman.shopCode
+					
+				}, failres => {
+					uni.showToast({
+						title: failres.errmsg,
+						icon: "none"
+					});
+				}).then(res => {
+					uni.showToast({
+						title: '绑定成功',
+						icon: "none"
+					});
+					that.isbind=1
+				})
+				//event.stopPropagation(); 
+				//this.isbind=1;
 			},
 			/**
 			 *  会员卡下拉和回弹
@@ -430,4 +529,77 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 		}
 	}
 	
+	   .ls-form{
+			padding:3px;
+			background-color: white;
+			margin-top: 10px;
+			border-radius: 5px;
+			padding-bottom: 10px;
+			position: relative;
+		}
+		.ls-close-btn{
+			position: absolute;
+			height: 2rem;
+			width: 2rem;
+			top: -4.5rem;
+			right: 0;
+		}
+		.ls-form-item{
+			display: flex;
+			justify-content: space-around;
+			align-items: center;
+			height: 2.5rem;
+			line-height: 2.8rem;
+		}
+		.ls-form-label{
+			flex: 1;
+			text-align:center;
+		}
+		.ls-form-input-box{
+			flex: 3;
+		}
+		.ls-form-input{
+			width:89%;
+			border-bottom: 1px solid lightgray;
+		}
+		.ls-btn-box{
+			margin-top: 3rem;
+			display: flex;
+			justify-content: space-around;
+			align-items: center;
+		}
+		.ls-btn{
+			font-size: 30rpx;
+			line-height: 2.5rem;
+			height:2.5rem;
+			padding: 0;
+			border-radius: 1rem;
+			background: linear-gradient(to right, #00FFD5 ,#008CFF) !important;
+			color: #FFFFFF !important;
+			width: 86%;
+			display: block;
+		}
+		.ls-btn::after{border-radius:5px !important; border:none;}
+
+		.bgbox{
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			eft: 0;
+			right: 0;
+			background:rgba(0, 0, 0,0.7);
+			overflow: hidden;
+		}
+		.bgbox .contentbox{
+			display:flex;
+			flex-direction: column;
+			width: 65%;
+			height: 43%;
+			background: white;
+			border-radius: 0.5rem;
+			margin: 50% auto auto auto;
+			overflow: hidden;
+		}
 </style>

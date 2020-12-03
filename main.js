@@ -140,6 +140,7 @@ const requestGet = (_gp, _mt, data = {}, failCallback) => {
 				// 'ACCESSTOKEN': accessToken
 			},
 			success: (res) => {
+				console.log("res.data.msg==="+JSON.stringify(res))
 				if (res.statusCode === 200) {
 					if (res.data.code === 0) {
 						resolve(res.data);
@@ -279,10 +280,11 @@ const uploadImg = (successCallback) => {
 								signature: signRes.data.signature
 							},
 							success: function(uploadRes) {
-								console.log("result==="+JSON.stringify(uploadRes))
+								// console.log("uploadImg_success===="+JSON.stringify(uploadRes))
 								uni.hideLoading()
 								if (uploadRes.statusCode === 200) {
 									if (successCallback) {
+										// console.log("imgurl==== "+signRes.data.baseUrl + fileName)
 										successCallback(signRes.data.baseUrl + fileName)
 									} else {
 										uni.showToast({
@@ -297,6 +299,9 @@ const uploadImg = (successCallback) => {
 										icon: 'none'
 									})
 								}
+							},
+							fail(res) {
+								// console.log("uploadImg_fail==="+JSON.stringify(uploadRes))
 							}
 						})
 					}

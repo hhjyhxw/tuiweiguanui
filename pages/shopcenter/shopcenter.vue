@@ -12,8 +12,9 @@
 								<text  class="username">余额:{{shop.balance || 0}}元</text>
 							</view>
 							<view class="info-btn">
-								<view>
-									<button type="default" class="grace-button" size="mini" style="margin-bottom: 10px;">开店</button>
+								<view v-show="shop.id">
+									<button type="default" v-show="shop.status=='0'"  class="grace-button" size="mini" style="margin-bottom: 10px;" @click="updateShopSatus('1')">开店</button>
+									<button type="default" v-show="shop.status=='1'"  class="grace-button" size="mini" style="margin-bottom: 10px;" @click="updateShopSatus('0')">关闭</button>
 								</view>
 								<view>
 									<button type="default" class="grace-button" size="mini">提现</button>
@@ -25,7 +26,7 @@
 				<!--  -->
 				<view class="tihuoaddress">
 					<label class="address-label">提货地址:</label>
-					<input type="text" class="tihuoaddress-input" name="name1" placeholder="" :value="shop.selfaddress"></input>
+					<input type="text" class="tihuoaddress-input"  placeholder="编辑自提地址" :value="shopStore.address"></input>
 					<view class="btndiv" @tap="showShade">
 						<image class="img" src="../../static/addressedit.png"></image>
 					</view>
@@ -54,7 +55,7 @@
 						</view>
 						<text class="grace-list-arrow-right grace-icons icon-arrow-right"></text>
 					</view>
-						<view class="grace-list-items">
+						<view class="grace-list-items" @click="navigo('/pages/shopcategory/shopcategory')">
 							<text class="grace-list-icon grace-icons icon-article grace-blue-sky"></text>
 							<view class="grace-list-body grace-border-b">
 								<view class="grace-list-title">
@@ -110,7 +111,10 @@ import graceShade from "../../graceUI/components/graceShade.vue";
 				shop:{
 					shopName:'大萝卜店铺',
 					shopImg:'/static/missing-face.png',
-					selfaddress:''
+					status:'0', //0 关闭 1开启
+				},
+				shopStore:{
+					address:''
 				}
 			}
 		},
@@ -126,6 +130,8 @@ import graceShade from "../../graceUI/components/graceShade.vue";
 				    // error
 				}
 			}
+			this.init();
+			
 		},
 		onLoad(option){
 			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
@@ -135,10 +141,61 @@ import graceShade from "../../graceUI/components/graceShade.vue";
 			...mapState(['hasLogin','userInfo'])
 		},
 		methods: {
+			init(){
+				//
+				this.getShopinfo();
+			},
 			navigo(url){
 				uni.navigateTo({
 					url: url
 				})
+			},
+			//获取店铺信息
+			getShopinfo(){
+				var that = this;
+				that.$api.requestGet('shopkeeper/shopcenter', 'shopinfo',null,failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.shop = res.shop;
+					if(res.shopStore!=null){
+						that.shopStore = res.shopStore;
+					}
+				});
+			},
+			//开启或者关闭店铺
+			updateShopSatus(status){
+				var that = this;
+				var content = status=='1'?'确定开启店铺':'确定关闭店铺'
+				uni.showModal({
+					title: '提示',
+					content: content,
+					showCancel: true,
+					confirmText: '确定',
+					success: (e) => {
+						if (e.confirm) {
+							that.$api.request('shopkeeper/shopcenter', 'updateShopSatus',{
+								id:that.shop.id,
+								status:status
+							}, failres => {
+								uni.showToast({
+									title: failres.errmsg,
+									icon: "none"
+								});
+							}).then(res => {
+								that.shop.status=status;
+								uni.showToast({
+									title: '操作成功',
+									icon: "none"
+								});
+							})
+						}
+					},
+					fail: () => {},
+					complete: () => {
+						
+					}
+				})
+				
 			},
 			//店铺功能面板
 			topanel(){
@@ -148,7 +205,7 @@ import graceShade from "../../graceUI/components/graceShade.vue";
 				})
 			},
 			showShade : function () {
-				this.selfaddress = this.shop.selfaddress;
+				this.selfaddress = this.shopStore.address;
 				this.$refs.graceShade.showIt();
 			},
 			closeShade : function () {
@@ -156,11 +213,25 @@ import graceShade from "../../graceUI/components/graceShade.vue";
 			},
 			//保存自提地址
 			saveaddress(){
-				if(this.selfaddress==null || this.selfaddress==''){
-					this.$api.msg('地址不能为空')
+				var that = this;
+				if(that.selfaddress==null || that.selfaddress==''){
+					that.$api.msg('地址不能为空')
 				}else{
-					this.shop.selfaddress = this.selfaddress;
-					this.closeShade();
+					that.shopStore.address = that.selfaddress;
+					that.shopStore.shopId = that.shop.id;
+					that.shopStore.titile = that.selfaddress;
+					that.closeShade();
+					that.$api.request('shopkeeper/shopcenter', 'saveStoreAddress',that.shopStore, failres => {
+						uni.showToast({
+							title: failres.errmsg,
+							icon: "none"
+						});
+					}).then(res => {
+						uni.showToast({
+							title: '操作成功',
+							icon: "none"
+						});
+					})
 				}
 				
 			},

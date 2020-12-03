@@ -3,16 +3,17 @@
 		<view slot="gBody" class="grace-flex-v1" id="gBody">
 			<!-- 数据区域 -->
 			<view class="grace-cate-wrap grace-space-between">
-				<button @click="showShade" class="grace-cate-left-item" style="position: fixed;width: 100px;top: 43px;left:0;z-index: 2;display: flex;justify-content: center;align-items: center;border: 1px solid lightgray;">添加分类</button>
+				<button @click="showShade('P','add')" class="grace-cate-left-item addbtn" style="">添加分类</button>
 				<scroll-view scroll-y scroll-with-animation class="grace-cate-left grace-scroll-y" :style="{height:mainHeight+'px'}" :scroll-into-view="leftTo">
-					<view  :class="['category-item', currentCateIndex == index ? 'grace-cate-left-current' : '']" v-for="(item,index) in categorylist" :key="index">
+					<view  :class="['category-item', currentCateIndex == index ? 'grace-cate-left-current' : '']" v-for="(item,index) in categorylist" :key="index"
+					 @click="showCategory(item,index)">
 						<view class="category-name">{{item.title}}</view>
-						<view class="caategory-icon">x</view>
+						<view class="caategory-icon" @click.stop="deleteCategory(item.id)">x</view>
 					</view>
 				</scroll-view>
 				<scroll-view  scroll-with-animation 
 					scroll-y class="grace-cate-right grace-scroll-y" :style="{height:mainHeight+'px'}">
-					<view>
+					<view @click="showShade('P','edit')">
 						<image :src="category.picUrl" class="category-main-img"></image>
 					</view>
 					<view class="category-title">
@@ -24,12 +25,12 @@
 								<block v-for="(item,index) in categorysonlist" :key="index">
 									<view class="uni-uploader__file" style="position: relative;">
 										<image class="uni-uploader__img" :src="item.picUrl" @tap="previewImage"></image>
-										<view class="close-view" @click="close(item, index)">x</view>
+										<view class="close-view" @click.stop="deleteCategory(item.id)">x</view>
 										<view class="uni-uploader-title">{{item.title}}</view>
 									</view>
 								</block>
 								<view class="uni-uploader__input-box" v-show="categorysonlist.length < 5">
-									<view class="uni-uploader__input" @click="showShade"></view>
+									<view class="uni-uploader__input" @click="showShade('S','add')"></view>
 								</view>
 							</view>
 						</view>
@@ -42,20 +43,20 @@
 					<view class="category-box-title">{{selectcategorytitle}}</view>
 					<view class="my-form-item">
 						<text class="my-form-label">分类名称</text>
-						<input class="my-form-input" />
+						<input class="my-form-input" v-model="addCategory.title"/>
 					</view>
 					<view class="my-form-item">
 						<text class="my-form-label-start">分类图片</text>
 						<!-- 图片选择  -->
 						<view class="goods-imgbox">
-							<button class="goods-imgbox-icon" v-if="category.picUrl==''" @tap="chooseImg()">+添加图片</button>
-							<image class="goods-msg-in" :src="category.picUrl" @tap="chooseImg()"/>
+							<button class="goods-imgbox-icon" v-if="addCategory.picUrl==''" @tap="chooseImg()">+添加图片</button>
+							<image class="goods-msg-in" :src="addCategory.picUrl" @tap="chooseImg()"/>
 						</view>
 					</view>
 					
 					<view class="skufooter">
 						<button class="btn"  @tap.stop="closeShade">关闭</button>
-						<button class="btn" @tap="save">保存</button>
+						<button class="btn" @tap="saveCategory">保存</button>
 					</view>
 				</view>
 			</graceShade>
@@ -71,22 +72,24 @@ export default {
     	return {
 			mainHeight : 500,
 			// 左侧分类
-			currentCateIndex : 1,
+			currentCateIndex : 0,
 			// 左侧滚动定位
 			leftTo : 'cate1',
 			// 延迟执行防止卡顿
 			scrollTimer : null,
 			selectcategorytitle:'添加一级分类',//根据被选择的分类动态修改
 			category:{id:1,title:'新鲜蔬菜',picUrl:'../../static/emptyCart.jpg'},
+			addCategory:{
+				title:'',
+				picUrl:'',
+			},
 			categorylist:[
 				{id:1,title:'新鲜蔬菜',picUrl:''},
 				{id:2,title:'新鲜肉类',picUrl:''},
 				{id:2,title:'粮油米面',picUrl:''}
 			],
 			categorysonlist:[
-				{id:1,title:'新鲜蔬菜',picUrl:'../../static/tab-cart.png'},
-				{id:2,title:'新鲜肉类',picUrl:'../../static/tab-cart.png'},
-				{id:2,title:'粮油米面',picUrl:'../../static/tab-cart.png'}
+				
 			],
 		}
     },
@@ -97,12 +100,62 @@ export default {
 			}
 		});
 	},
+	onShow() {
+		this.init();
+	},
 	onLoad : function () {
 		
 	},
 	methods:{
 		
-		
+		init(){
+			this.getCategoryList();
+			//this.category = (this.categorylist!=null && this.categorylist.length>0)?this.categorylist[0]:null;
+		},
+		//获取商品分类列表
+		getCategoryList(){
+			var that = this;
+			that.$api.requestGet('shopkeeper/shopCategory', 'categoryList',{},failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				that.categorylist = res.list;
+				if (res.list!=null && res.list.length>0) {
+					that.category = that.categorylist[0];
+					if (that.category.childList!=null && that.category.childList.length>0) {
+						that.categorysonlist = that.category.childList;
+					}
+				}
+			});
+		},
+		//点击分类，查看分类
+		showCategory(item,index){
+			this.category = item;
+			this.currentCateIndex = index;
+			var that = this;
+			if (that.category.childList!=null && that.category.childList.length>0) {
+				that.categorysonlist = that.category.childList;
+			}
+		},
+		//保存分类
+		saveCategory(){
+			var that = this;
+			that.$api.request('shopkeeper/shopCategory', 'saveCategory',that.addCategory, failres => {
+				uni.showToast({
+					title: failres.errmsg,
+					icon: "none"
+				});
+			}).then(res => {
+				that.addCategory = res.smallCategory;
+				uni.showToast({
+					title: '保存成功',
+					icon: "none"
+				});
+			})
+		},
+		//删除分类
+		deleteCategory(id){
+			
+		},
 		gotoinfo : function(e){
 			console.log(e);
 			uni.showToast({
@@ -116,8 +169,30 @@ export default {
 		    });
 		},
 		/* 弹窗相关start */
-		showShade : function () {
+		showShade : function (sp,type) {
 			this.$refs.graceShade.showIt();
+			//编辑父分类
+			if('P'==sp && type=='edit' && this.category.id!=null){
+				this.addCategory = this.category;
+				this.selectcategorytitle = '编辑一级分类';
+			}
+			//添加新分类
+			if('P'==sp && type=='add'){
+				this.addCategory = {
+					title:'',
+					picUrl:'',
+				};
+				this.selectcategorytitle = '添加一级分类';
+			}
+			//添加子分类
+			if('S'==sp && type=='add' && this.category.id!=null){
+				this.addCategory = {
+					parentId:this.category.id,
+					title:'',
+					picUrl:'',
+				};
+				this.selectcategorytitle = '添加二级分类';
+			}
 		},
 		closeShade : function () {
 			this.$refs.graceShade.hideIt();
@@ -128,7 +203,8 @@ export default {
 		chooseImg() { //选择图片
 			const that = this
 			that.$api.uploadImg((res => {
-				that.spu.img = res;
+				that.addCategory.picUrl = res;
+				console.log("addCategory==="+JSON.stringify(that.addCategory))
 			}))
 		},
 	},
@@ -148,6 +224,23 @@ export default {
 .grace-product-title{line-height:50rpx; font-size:28rpx; display:block; width:100%;}
 .grace-product-price{line-height:60rpx; font-size:32rpx; color:#FF0036; display:block; width:100%;}
 .grace-product-btn{line-height:60rpx; font-size:40rpx; color:#FF0036; padding-right:20rpx;}
+
+/* #ifdef MP-WEIXIN */
+	.addbtn{
+		position: fixed;width: 100px;
+		top: 0px;
+		left:0;z-index: 2;display: flex;justify-content: center;align-items: center;border: 1px solid lightgray;
+	} 
+/* #endif */
+
+/* #ifdef H5 */
+	.addbtn{
+		position: fixed;width: 100px;
+		top: 43px;
+		left:0;z-index: 2;display: flex;justify-content: center;align-items: center;border: 1px solid lightgray;
+	}  
+/* #endif */
+
 .category-item{
 	display: flex;
 	justify-content:center ;
@@ -330,11 +423,11 @@ export default {
 		width: 25.8rem;
 		height: 43.2rem;
 	}
-	#ifndef H5
-	.addgoods-box-margintop{
-		margin-top: 2.8rem;
-	}
-	#endif
+	/* #ifdef H5 */
+		.addgoods-box-margintop{
+			margin-top: 2.8rem;
+		}
+	/* #endif */
 	.my-form-item{
 		display: flex;
 		justify-content: space-around;

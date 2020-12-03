@@ -288,9 +288,9 @@
 		"list": [
 			{
 				"name": "功能面板", //模式名称
-				"path": "pages/shoppanel/shoppanel", //启动页面，必选
+				"path": "pages/user/user", //启动页面，必选
 				"query": "" //启动参数，在页面的onLoad函数里面得到
 			}
 		]
-	} 
+	}
 }
