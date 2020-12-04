@@ -63,15 +63,15 @@
 							<text class="skucell">原价</text>
 							<text class="skucell">团购价</text>
 							<text class="skucell">库存</text>
-							<text class="skucell">+</text>
+							<text class="skucell" @click="addSkuItem">+</text>
 						</view>
-						<view class="skuitem" v-for="(item,index) in skulist" :key="index">
+						<view class="skuitem" v-for="(item,index) in skulist" :key="index" >
 							<input class="skucell" :value="item.title" />
 							<input class="skucell" :value="item.unit"/>
 							<input class="skucell" :value="item.originalPrice"/>
 							<input class="skucell" :value="item.price"/>
 							<input class="skucell" :value="item.stock"/>
-							<text class="skucell">-</text>
+							<text class="skucell" @click="deletSku(index)">-</text>
 						</view>
 					</view>
 					<view class="release-content">
@@ -116,15 +116,15 @@ export default {
 			// 第1个菜单
 			selectVal1 : 0,
 			show1 : false,
-			selectMenu1 : ['综合排序', '价格排序', '评价排序', '人气排序'],
+			selectMenu1 : ['综合排序', '价格降序', '价格升序', '人气排序'],
 			// 第2个菜单
 			selectVal2 : 0,
 			show2 : false,
-			selectMenu2 : ['不限价格', '100 - 1000', '1000 - 10000', '10000 +'],
+			selectMenu2 : ['不限价格', '0-100','100-1000', '1000-10000', '10000+'],
 			// 第3个菜单
 			selectVal3 : 0,
 			show3 : false,
-			selectMenu3 : ['商品分类', '黑色', '蓝色', '红色'],
+			selectMenu3 : [],//分类列表
 			
 			// 侧边抽屉
 			filterHeight : 300,
@@ -148,9 +148,16 @@ export default {
 				img:'',
 				detail:''
 			},
-			skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}]	
+			skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}],
 			
 			// 上传按钮名称
+			queryData:{
+				sidx:"",//排序字段
+				order:"",//asc desc
+				categoryTitle:"",//商品分类名称
+				miniPrice:null,//最新商品价格
+				maxPrice:null//最新商品价格
+			},
 		}
 	},
 	onShow() {
@@ -179,13 +186,13 @@ export default {
 	},
 	methods:{
 		init(){
-			//获取商品列表数据
-			this.getSpuList();
+			this.getSpuList(this.queryData);//获取商品列表数据
+			this.getCategoryList();//商品分类列表
 		},
 		//获取店铺信息
-		getSpuList(){
+		getSpuList(data){
 			var that = this;
-			that.$api.request('shopkeeper/shopgoods', 'goodsSpuList',{},failres => {
+			that.$api.request('shopkeeper/shopgoods', 'goodsSpuList',data,failres => {
 				that.$api.msg(failres.msg)
 			}).then(res => {
 				if (res.list!=null && res.list.length>0) {
@@ -197,7 +204,7 @@ export default {
 						item.title      = item.title;
 						item.price      = "现价：¥ "+item.price;
 						item.originalPrice  = "原价：¥ "+item.originalPrice;
-						item.btns = [{'name':'删除', bgColor:'#FF0036'}];
+						item.btns = [{'name':'编辑', bgColor:'#333333'},{'name':'删除', bgColor:'#FF0036'}];
 						newData.push(item);
 					})
 					// 转换后将数据赋值到组件
@@ -207,22 +214,66 @@ export default {
 				}
 			});
 		},
-		
+		//获取店铺分类列表信息
+		getCategoryList(){
+			var that = this;
+			that.$api.requestGet('shopkeeper/shopCategory', 'getGategoryList',null,failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				if (res.list!=null && res.list.length>0) {
+					var newData = [];
+					// 遍历数据 转换对象格式
+					newData.push('全部');
+					res.list.forEach((item)=>{
+						newData.push(item.title);
+					})
+					// 转换后将数据赋值到组件
+					this.selectMenu3 = newData;
+				}else{
+					that.selectMenu3=[];
+				}
+			});
+		},
 		// 下拉选择
 		showMenu1  : function () {this.show1 = true;},
 		closeMenu1 : function () {this.show1 = false;},
 		select1    : function (index) {
-			console.log("选择了 " + this.selectMenu1[index]);
+			if(index==1){//价格降序
+				this.queryData.sidx="price";
+				this.queryData.order="desc";
+			}else if(index==2){//价格升序
+				this.queryData.sidx="price";
+				this.queryData.order="asc";
+			}
+			this.getSpuList(this.queryData);
+			//console.log("选择了 " + this.selectMenu1[index]);
 		},
 		showMenu2  : function () {this.show2 = true;},
 		closeMenu2 : function () {this.show2 = false;},
 		select2    : function (index) {
-			console.log("选择了 " + this.selectMenu2[index]);
+			if(index==0){//不限价格
+				this.queryData.miniPrice="";
+				this.queryData.maxPrice=""
+			}else if(index==this.selectMenu2.length-1){
+				this.queryData.miniPrice=this.selectMenu2[index].split("+")[0];
+				this.queryData.maxPrice=""
+			}else{
+				let pricearry = this.selectMenu2[index].split("-");
+				this.queryData.miniPrice=pricearry[0];
+				this.queryData.maxPrice=pricearry[1];
+			}
+			this.getSpuList(this.queryData);
+			//console.log("选择了 " + this.selectMenu2[index]);
 		},
 		showMenu3  : function () {this.show3 = true;},
 		closeMenu3 : function () {this.show3 = false;},
 		select3    : function (index) {
-			console.log("选择了 " + this.selectMenu3[index]);
+			if(index==0){
+				this.queryData.categoryTitle="";
+			}else{
+				this.queryData.categoryTitle=this.selectMenu3[index];
+			}
+			this.getSpuList(this.queryData);
 		},
 		// 条件筛选
 		openFilter : function () {
@@ -251,13 +302,15 @@ export default {
 		btnTap : function(index, btnIndex){
 			console.log(index, btnIndex);
 			// 第一个按钮被点击 [ 标记已读 ]
-			if(btnIndex == 0){
+			if(btnIndex == 1){
 				uni.showModal({
 					title:"确定要删除吗?",
 					success: (e) => {
 						if(e.confirm){this.msgs.splice(index, 0);}
 					}
 				});
+			}else{
+				//编辑
 			}
 		},
 		// 商品项列表本身被点击
@@ -285,6 +338,37 @@ export default {
 			console.log('picker发送选择改变，携带值为', e.target.value)
 			this.index = e.target.value
 		},
+		//添加商品sku
+		addSkuItem(){
+			let item = {
+				id:null,
+				title:'',
+				unit:'',
+				originalPrice:null,
+				price:null,
+				stock:20,
+			}
+			this.skulist.push(item);
+			//skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}],
+		},
+		//保存商品级子商品
+		save(){
+			
+		},
+		//删除商品sku
+		deletSku(index){
+			var that = this;
+			var item = that.skulist[index];
+			if(item.id!=null){
+				that.$api.requestGet('shopkeeper/shopgoods', 'delSpu',{id:item.id},failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.skulist.splice(index,1);
+				});
+			}else{
+				that.skulist.splice(index,1);
+			}
+		}
 	}
 }
 </script>
@@ -299,7 +383,7 @@ export default {
 	justify-content:center;
 }
 /* #endif */
-.graceSelectMenuItem{width:187rpx; line-height:90rpx;}
+.graceSelectMenuItem{width:245rpx !important; line-height:90rpx;}
 
 .grace-filter-buttons{position:absolute; z-index:9999; width:680rpx; left:0; bottom:0; height:50px; box-sizing:border-box;}
 .grace-filter-button{width:600rpx; height:50px; line-height:50px; text-align:center; font-size:28rpx; display:block;}
@@ -432,7 +516,7 @@ export default {
 	align-items: center;
 	border-top: 1px solid;
 	background: white !important;
-	 bottom: 2.2rem;
+	 bottom: 4.2rem;
 	right: 0;
 	left: 0;
 	
