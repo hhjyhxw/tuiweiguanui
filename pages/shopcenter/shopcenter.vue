@@ -64,7 +64,7 @@
 							</view>
 							<text class="grace-list-arrow-right grace-icons icon-arrow-right"></text>
 						</view>
-						<view class="grace-list-items">
+						<view class="grace-list-items" @click="navigo('/pages/upgoods/upgoods')">
 							<text class="grace-list-icon grace-icons icon-wallet grace-green"></text>
 							<view class="grace-list-body grace-border-b">
 								<view class="grace-list-title">

@@ -109,29 +109,7 @@ import uniBadge from '@/components/uni-badge/uni-badge.vue';
 
 var systemInfo = require('../../graceUI/jsTools/systemInfo.js');
 // 模拟个 api 请求的数据
-var msgsFromApi = [
-	{
-		img       : 'https://fudezao.oss-cn-qingdao.aliyuncs.com/statics/uper/201909/23/5d882ce3900b7.png',
-		msgnumber : 8,
-		title     : "商品名称",
-		price      : "商品现价",
-		originalPrice   : "商品原价"
-	},
-	{
-		img       : 'https://fudezao.oss-cn-qingdao.aliyuncs.com/statics/uper/201909/23/5d882db43842c.png',
-		msgnumber : 0,
-		title     : "账户通知",
-		price      : "2019-08-11",
-		originalPrice   : "您的账户入账 *** 元"
-	},
-	{
-		img       : 'https://fudezao.oss-cn-qingdao.aliyuncs.com/statics/uper/201909/23/5d882ce3900b7.png',
-		msgnumber : 12,
-		title     : "优惠促销",
-		price      : "昨天",
-		originalPrice   : "草木有本心，何求美人折？"
-	},
-];
+
 export default {
 	data(){
 		return {
@@ -175,19 +153,22 @@ export default {
 			// 上传按钮名称
 		}
 	},
+	onShow() {
+		this.init();	
+	},
 	onLoad : function () {
 		var system = systemInfo.info();
 		this.filterHeight = system.windowHeight;
 		this.scrollHeight = system.windowHeight - 80;
 		
 		// 模拟 api 请求，因为请求数据里没有按钮信息我们利用js进行按钮补充
-		setTimeout(() => {
-			for(let i = 0; i < msgsFromApi.length; i++){
-				// 具体几个按钮及按钮文本根据项目需求来，格式 {name:按钮文本, bgColor:按钮背景色}
-				msgsFromApi[i].btns = [{'name':'删除', bgColor:'#FF0036'}];
-			}
-			this.msgs = msgsFromApi;
-		}, 500);
+		// setTimeout(() => {
+		// 	for(let i = 0; i < msgsFromApi.length; i++){
+		// 		// 具体几个按钮及按钮文本根据项目需求来，格式 {name:按钮文本, bgColor:按钮背景色}
+		// 		msgsFromApi[i].btns = [{'name':'删除', bgColor:'#FF0036'}];
+		// 	}
+		// 	this.msgs = msgsFromApi;
+		// }, 500);
 	},
 	components:{
 		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList,graceShade,
@@ -197,6 +178,36 @@ export default {
 		uniBadge
 	},
 	methods:{
+		init(){
+			//获取商品列表数据
+			this.getSpuList();
+		},
+		//获取店铺信息
+		getSpuList(){
+			var that = this;
+			that.$api.request('shopkeeper/shopgoods', 'goodsSpuList',{},failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				if (res.list!=null && res.list.length>0) {
+					var newData = [];
+					// 遍历数据 转换对象格式
+					res.list.forEach((item)=>{
+						item.img    = item.img;
+						item.msgnumber      = item.id;
+						item.title      = item.title;
+						item.price      = "现价：¥ "+item.price;
+						item.originalPrice  = "原价：¥ "+item.originalPrice;
+						item.btns = [{'name':'删除', bgColor:'#FF0036'}];
+						newData.push(item);
+					})
+					// 转换后将数据赋值到组件
+					this.msgs = newData;
+				}else{
+					that.msgs=[];
+				}
+			});
+		},
+		
 		// 下拉选择
 		showMenu1  : function () {this.show1 = true;},
 		closeMenu1 : function () {this.show1 = false;},
@@ -236,6 +247,7 @@ export default {
 			this.$refs.graceSelectTags1.graceSelectChange(0);
 		},
 		
+		//删除商品
 		btnTap : function(index, btnIndex){
 			console.log(index, btnIndex);
 			// 第一个按钮被点击 [ 标记已读 ]
@@ -248,10 +260,10 @@ export default {
 				});
 			}
 		},
-		// 列表本身被点击
+		// 商品项列表本身被点击
 		itemTap : function (e) {
-			console.log(e);
-			uni.showToast({title:"索引"+e});
+			// console.log(e);
+			// uni.showToast({title:"索引"+e});
 		},
 		/* 弹窗相关start */
 		showShade : function () {
