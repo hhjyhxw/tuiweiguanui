@@ -44,16 +44,16 @@
 						<image class="goods-msg-in" :src="spu.img" @tap="chooseImg()"/>
 					</view>
 					<view class="goods-title">
-						<input value="" placeholder="商品名称" style="text-align: center;"/>
+						<input  placeholder="商品名称" style="text-align: center;" v-model="spu.title"/>
 					</view>
 					<view class="goods-tab">
 						<view class="uni-list-cell-db">
-							<picker @change="bindPickerChange" :value="index" :range="category">
-								<view class="uni-input">{{category[index].title}}</view>
+							<picker @change="bindPickerChange" :value="categoryIndex" :range="categoryTitle">
+								<view class="uni-input">{{categoryTitle[categoryIndex]}}</view>
 							</picker>
 						</view>
 						<view class="unite">
-							<input type="number" placeholder="请输入计量单位(份)"/>
+							<input type="number" v-model="spu.unit"  placeholder="请输入计量单位(份)"/>
 						</view>
 					</view>
 					<view class="skulist">
@@ -63,14 +63,16 @@
 							<text class="skucell">原价</text>
 							<text class="skucell">团购价</text>
 							<text class="skucell">库存</text>
+							<text class="skucell">剩余库存</text>
 							<text class="skucell" @click="addSkuItem">+</text>
 						</view>
 						<view class="skuitem" v-for="(item,index) in skulist" :key="index" >
-							<input class="skucell" :value="item.title" />
-							<input class="skucell" :value="item.unit"/>
-							<input class="skucell" :value="item.originalPrice"/>
-							<input class="skucell" :value="item.price"/>
-							<input class="skucell" :value="item.stock"/>
+							<input class="skucell" v-model="item.title" />
+							<input class="skucell" v-model="item.unit"/>
+							<input class="skucell" v-model="item.originalPrice"/>
+							<input class="skucell" v-model="item.price"/>
+							<input class="skucell" v-model="item.stock"/>
+							<input  class="skucell" v-model="item.remainStock" disabled="true"/>
 							<text class="skucell" @click="deletSku(index)">-</text>
 						</view>
 					</view>
@@ -141,14 +143,21 @@ export default {
 			],
 			msgs : [],//
 			goodsimg:'',
-			category:[{id:1,title:'蔬菜'},{id:2,title:'水果'}],
+			
+			categoryIndex:0,
+			categoryTitle:[],
+			categoryList:[],
 			index: 0,
 			spu:{
-				title:'新鲜蔬菜',
+				title:'',
 				img:'',
-				detail:''
+				detail:'',
+				unit:'',
+				categoryId:null,
+				price:0,
+				originalPrice:0
 			},
-			skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}],
+			skulist:[],
 			
 			// 上传按钮名称
 			queryData:{
@@ -221,16 +230,23 @@ export default {
 				that.$api.msg(failres.msg)
 			}).then(res => {
 				if (res.list!=null && res.list.length>0) {
+					that.categoryList = res.list;
 					var newData = [];
+					var newData1 = [];
 					// 遍历数据 转换对象格式
 					newData.push('全部');
 					res.list.forEach((item)=>{
 						newData.push(item.title);
+						newData1.push(item.title);
 					})
 					// 转换后将数据赋值到组件
-					this.selectMenu3 = newData;
+					that.selectMenu3 = newData;
+					that.categoryTitle = newData1;
+					that.categoryTitle.splice(0,1);
+					
 				}else{
 					that.selectMenu3=[];
+					that.categoryTitle = [];
 				}
 			});
 		},
@@ -334,9 +350,11 @@ export default {
 				that.spu.img = res;
 			}))
 		},
+		//编辑商品 选择分类
 		 bindPickerChange: function(e) {
-			console.log('picker发送选择改变，携带值为', e.target.value)
-			this.index = e.target.value
+			//console.log('picker发送选择改变，携带值为', JSON.stringify(e.target.value))
+			this.categoryIndex = e.target.value;
+			//this.spu.categoryId = this.categoryTitle[this.categoryIndex].id;
 		},
 		//添加商品sku
 		addSkuItem(){
@@ -347,12 +365,56 @@ export default {
 				originalPrice:null,
 				price:null,
 				stock:20,
+				remainStock:0
 			}
 			this.skulist.push(item);
 			//skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}],
 		},
 		//保存商品级子商品
 		save(){
+			var that = this;
+			if(that.spu.title==null || that.spu.title==''){
+				that.$api.msg('商品名称不能为空')
+				return;
+			}
+			if(that.spu.img==null || that.spu.img==''){
+				that.$api.msg('商品图片不能为空')
+				return;
+			}
+			if(that.skulist==null || that.skulist.length==0){
+				that.$api.msg('请添加商品规格')
+				return;
+			}
+			that.skulist.forEach(p=>{
+				if(p.title==null || p.title==''){
+					that.$api.msg('规格名称不能为空')
+					return;
+				}
+				if(p.price==null || p.price==''){
+					that.$api.msg('规格现价不能为空')
+					return;
+				}
+				if(p.originalPrice==null || p.originalPrice==''){
+					that.$api.msg('规格原价不能为空')
+					return;
+				}
+				if(p.stock==null || p.stock=='' || p.stock<p.remainStock){
+					that.$api.msg('规格库存不能为空，并且不能小于剩余库存')
+					return;
+				}
+			});
+			that.spu.price = that.skulist[0].price;
+			that.spu.originalPrice = that.skulist[0].originalPrice;
+			that.spu.skulist = that.skulist;
+			that.spu.categoryId = that.categoryList[that.categoryIndex].id;
+			console.log("spu==="+JSON.stringify(that.spu));
+			that.$api.request('shopkeeper/shopgoods', 'saveSpu',that.spu,failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				that.spu = res.smallSpu;
+				that.skulist = res.smallSpu.skulist;
+				that.$api.msg("保存成功")
+			});
 			
 		},
 		//删除商品sku
@@ -463,6 +525,7 @@ export default {
 }
 .uni-list-cell-db{
 	flex: 1;
+	border-right: 1px solid;
 }
 .unite{
 	flex: 1;
@@ -503,6 +566,7 @@ export default {
 	border: 1px solid lightgray;
 	height: 2rem;
 	line-height: 2rem;
+	overflow: hidden;
 }
 
 .release-content{
