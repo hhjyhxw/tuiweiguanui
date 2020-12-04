@@ -40,7 +40,7 @@
 				<view class="addgoods-box grace-relative" @tap.stop="">
 					<!-- 图片选择  -->
 					<view class="goods-imgbox">
-						<button class="goods-imgbox-icon" v-if="spu.img==''" @tap="chooseImg()">+添加图片</button>
+						<button class="goods-imgbox-icon grace-bg-light-blue" v-if="spu.img==''" @tap="chooseImg()">+添加图片</button>
 						<image class="goods-msg-in" :src="spu.img" @tap="chooseImg()"/>
 					</view>
 					<view class="goods-title">
@@ -77,9 +77,12 @@
 						</view>
 					</view>
 					<view class="release-content">
-						<view>
-							<textarea name="content" placeholder="请输入商品详情......" class="release-content-input" value="" v-model="spu.detail"/>
+						 <view class="uni-common-mt" style="background:#FFF; padding:20rpx;">
+							<rich-text :nodes="spu.detail"></rich-text>
 						</view>
+						<!-- <view>
+							<textarea name="content" placeholder="请输入商品详情......" class="release-content-input" value="" v-model="spu.detail"/>
+						</view> -->
 					</view>
 					<view class="skufooter">
 						<button class="btn"  @tap.stop="closeShade">关闭</button>
@@ -318,15 +321,47 @@ export default {
 		btnTap : function(index, btnIndex){
 			console.log(index, btnIndex);
 			// 第一个按钮被点击 [ 标记已读 ]
+			var that = this;
 			if(btnIndex == 1){
 				uni.showModal({
 					title:"确定要删除吗?",
 					success: (e) => {
-						if(e.confirm){this.msgs.splice(index, 0);}
+						if(e.confirm){
+							var id = that.msgs[index].msgnumber;
+							that.$api.requestGet('shopkeeper/shopgoods', 'delSpu',{id:id},failres => {
+								that.$api.msg(failres.msg)
+							}).then(res => {
+								that.msgs.splice(index,1);
+							});
+						}
 					}
 				});
 			}else{
-				//编辑
+				var that = this;
+				var id = that.msgs[index].msgnumber;
+				that.$api.requestGet('shopkeeper/shopgoods', 'spuInfo',{id:id},failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.spu =res.smallSpu;
+					that.skulist = res.smallSpu.skulist;
+					if(that.skulist!=null && that.skulist.length>0){
+						that.skulist.forEach(p=>{
+							let freezeStock = p.freezeStock;
+							freezeStock = freezeStock!=null?freezeStock:0;
+							p.remainStock = p.stock -freezeStock;
+						})
+					}
+					//编辑商品的时候设置 商品分类名称
+					if(that.categoryList!=null && that.categoryList.length>0){
+						for (var i = 0; i < that.categoryList.length; i++) {
+							if(that.categoryList[i].id==that.spu.categoryId){
+								that.categoryIndex = i;
+							}
+						}
+					}
+					
+				});
+				this.showShade();
 			}
 		},
 		// 商品项列表本身被点击
@@ -422,7 +457,7 @@ export default {
 			var that = this;
 			var item = that.skulist[index];
 			if(item.id!=null){
-				that.$api.requestGet('shopkeeper/shopgoods', 'delSpu',{id:item.id},failres => {
+				that.$api.requestGet('shopkeeper/shopgoods', 'delSku',{id:item.id},failres => {
 					that.$api.msg(failres.msg)
 				}).then(res => {
 					that.skulist.splice(index,1);
