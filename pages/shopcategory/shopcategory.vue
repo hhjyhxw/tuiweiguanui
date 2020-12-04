@@ -8,7 +8,7 @@
 					<view  :class="['category-item', currentCateIndex == index ? 'grace-cate-left-current' : '']" v-for="(item,index) in categorylist" :key="index"
 					 @click="showCategory(item,index)">
 						<view class="category-name">{{item.title}}</view>
-						<view class="caategory-icon" @click.stop="deleteCategory(item.id)">x</view>
+						<view class="caategory-icon" @click.stop="deleteCategory(item.id,index,'P')">x</view>
 					</view>
 				</scroll-view>
 				<scroll-view  scroll-with-animation 
@@ -25,7 +25,7 @@
 								<block v-for="(item,index) in categorysonlist" :key="index">
 									<view class="uni-uploader__file" style="position: relative;">
 										<image class="uni-uploader__img" :src="item.picUrl" @tap="previewImage"></image>
-										<view class="close-view" @click.stop="deleteCategory(item.id)">x</view>
+										<view class="close-view" @click.stop="deleteCategory(item.id,index,'S')">x</view>
 										<view class="uni-uploader-title">{{item.title}}</view>
 									</view>
 								</block>
@@ -49,12 +49,12 @@
 						<text class="my-form-label-start">分类图片</text>
 						<!-- 图片选择  -->
 						<view class="goods-imgbox">
-							<button class="goods-imgbox-icon" v-if="addCategory.picUrl==''" @tap="chooseImg()">+添加图片</button>
+							<button class="goods-imgbox-icon grace-bg-light-blue" v-if="addCategory.picUrl==''" @tap="chooseImg()">+添加图片</button>
 							<image class="goods-msg-in" :src="addCategory.picUrl" @tap="chooseImg()"/>
 						</view>
 					</view>
 					
-					<view class="skufooter">
+					<view class="skufooter grace-bg-light-blue">
 						<button class="btn"  @tap.stop="closeShade">关闭</button>
 						<button class="btn" @tap="saveCategory">保存</button>
 					</view>
@@ -84,9 +84,7 @@ export default {
 				picUrl:'',
 			},
 			categorylist:[
-				{id:1,title:'新鲜蔬菜',picUrl:''},
-				{id:2,title:'新鲜肉类',picUrl:''},
-				{id:2,title:'粮油米面',picUrl:''}
+				
 			],
 			categorysonlist:[
 				
@@ -134,6 +132,8 @@ export default {
 			var that = this;
 			if (that.category.childList!=null && that.category.childList.length>0) {
 				that.categorysonlist = that.category.childList;
+			}else{
+				that.categorysonlist = []
 			}
 		},
 		//保存分类
@@ -153,8 +153,17 @@ export default {
 			})
 		},
 		//删除分类
-		deleteCategory(id){
-			
+		deleteCategory(id,index,type){
+			var that = this;
+			that.$api.requestGet('shopkeeper/shopCategory', 'delCategory',{id:id},failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				if (type=='P') {
+					that.categorylist.splice(index,1);
+				}else{
+					that.categorysonlist.splice(index,1);
+				}
+			});
 		},
 		gotoinfo : function(e){
 			console.log(e);
@@ -207,6 +216,8 @@ export default {
 				console.log("addCategory==="+JSON.stringify(that.addCategory))
 			}))
 		},
+	
+		
 	},
 	components:{gracePage,graceShade}
 }
@@ -469,7 +480,7 @@ export default {
 	}
 	.goods-imgbox{
 		position: relative;
-		background: lavender;
+		/* background: lavender; */
 		padding: 1rem;
 		display: flex;
 		justify-content: center;
@@ -484,7 +495,8 @@ export default {
 	.goods-imgbox-icon{
 		position: absolute;
 		top: 6rem;
-		left: 37%;
+		/* left: 37%; */
+		margin: auto;
 	}
 	.goods-msg-in{
 		    width: 100%;
@@ -493,7 +505,7 @@ export default {
 		    overflow: hidden;
 		    position: relative;
 		    margin: auto;
-			border-bottom: 1px solid lightgray;
+			/* border-bottom: 1px solid lightgray; */
 	}
 	
 	.category-box-title{
@@ -511,7 +523,7 @@ export default {
 		text-align: center;
 		align-items: center;
 		border-top: 1px solid;
-		background: white !important;
+		/* background: white !important; */
 		bottom: 2.2rem;
 		right: 0;
 		left: 0;
@@ -519,6 +531,6 @@ export default {
 	.skufooter .btn{
 			width: 80%;
 			flex: 1;
-			background: #white !important;
+			/* background: #white !important; */
 		}
 </style>
