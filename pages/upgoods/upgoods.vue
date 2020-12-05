@@ -162,7 +162,6 @@ export default {
 			},
 			skulist:[],
 			
-			// 上传按钮名称
 			queryData:{
 				sidx:"",//排序字段
 				order:"",//asc desc

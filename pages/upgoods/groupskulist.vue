@@ -21,11 +21,11 @@
 					@showMenu="showMenu3" @close="closeMenu3" @select="select3"></graceSelectMenu>
 				</view>
 				<!-- 分类排序 -->
-				<view class="graceSelectMenuItem grace-nowrap grace-flex-center grace-flex-vcenter">
+				<!-- <view class="graceSelectMenuItem grace-nowrap grace-flex-center grace-flex-vcenter">
 					<graceSelectMenu
 					:show="show4" :height="500" :items="selectMenu4" :selectIndex="selectVal4" 
 					@showMenu="showMenu4" @close="closeMenu4" @select="select4"></graceSelectMenu>
-				</view>
+				</view> -->
 			</view>
 			<!-- 这个 view 是用于占位的 避免吸顶元素遮住下面的内容 -->
 			<view style="height:100rpx;"></view>
@@ -35,33 +35,59 @@
 					 <view class="uni-list">
 						<checkbox-group @change="checkboxChange">
 							<label class="uni-list-cell uni-list-cell-pd groupGoodslist" v-for="(item,index) in groupGoodsList" :key="index">
-								<view>
-									<checkbox :value="item.id" :checked="item.checked" />
-								</view>
+								<!-- <view>
+									<checkbox  :checked="item.checked" />
+								</view> -->
 								<view><image :src="item.img" class="groupgoods-img"></image></view>
 								<view class="groupgoods-info">
 									<view class="groupgoods-title">【{{item.title}}】</view>
 									<view class="groupgoods-price">团购价:￥{{item.price}}</view>
 									<view class="groupgoods-originalPrice">原价:￥{{item.originalPrice}}</view>
 								</view>
-								<view v-show="item.status==0" @click="updateStatus(item,'1',index)"><button type="default" class="grace-button" size="mini">上架</button></view>
-								<view v-show="item.status==1" @click="updateStatus(item,'0',index)"><button type="default" class="grace-button" size="mini">下架</button></view>
+								<view v-show="item.upstatus==0" @click="addGroupGoods(item,index)"><button type="default" class="grace-button grace-bg-red" size="mini">去发布</button></view>
+								<view v-show="item.upstatus==1"><button type="default" class="grace-button" size="mini">已发布</button></view>
 							</label>
 						</checkbox-group>
 					</view>
 				</view>
 			</view>
 			
+			<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
+			<graceShade @closeShade="closeShade" ref="graceShade">
+				<view class="addgoods-box grace-relative" @tap.stop="">
+					<!-- 图片选择  -->
+					<view class="goods-imgbox">
+						<image class="goods-msg-in" :src="smallGroupShop.img"/>
+					</view>
+					<view class="goods-title">
+						<text style="text-align: left;">{{smallGroupShop.title}}</text>
+					</view>
+					<view class="goods-tab">
+						<view class="unite">
+							<text class="doller">团购价¥：</text><input type="text" style="color: red;" v-model="smallGroupShop.minPrice"  placeholder="团购价"/>
+						</view>
+					</view>
+					<view class="goods-tab">
+						<view class="unite">
+							<text class="doller">原价¥：</text><input type="text"  style="color: black;" v-model="smallGroupShop.maxPrice"  placeholder="单买价"/>
+						</view>
+					</view>
+					<view class="skufooter">
+						<button class="btn grace-bg-light-blue"  @tap.stop="closeShade">关闭</button>
+						<button class="btn grace-bg-light-blue" @tap="save">保存</button>
+					</view>
+				</view>
+			</graceShade>
 		</view>
 		<!-- 底部 -->
-		<view slot="gFooter" style="z-index: 0;">
+		<!-- <view slot="gFooter" style="z-index: 0;">
 			<view class="footer">
 				<button class="btn" @click="selectChexkbox">全选</button>
 				<button class="btn" @click="updateStatusBatch(0)">下架</button>
 				<button class="btn" @click="updateStatusBatch(1)">上架</button>
-				<button class="btn" @click="gogroupskulist">发布</button>
+				<button class="btn" @tap="showShade">发布</button>
 			</view>
-		</view>
+		</view> -->
 	</gracePage>
 </template>
 <script>
@@ -73,13 +99,15 @@ import graceSwipeList from "../../graceUI/components/graceSwipeListmy.vue";
 import graceShade from "../../graceUI/components/graceShade.vue";
 
 var systemInfo = require('../../graceUI/jsTools/systemInfo.js');
+// 模拟个 api 请求的数据
+
 export default {
 	data(){
 		return {
 			// 第1个菜单
 			selectVal1 : 0,
 			show1 : false,
-			selectMenu1 : ['综合排序', '价格降序', '价格升序', '人气排序'],
+		    selectMenu1 : ['综合排序', '价格降序', '价格升序', '人气排序'],
 			// 第2个菜单
 			selectVal2 : 0,
 			show2 : false,
@@ -87,10 +115,10 @@ export default {
 			// 第3个菜单
 			selectVal3 : 0,
 			show3 : false,
-			selectMenu3 : [],
+			selectMenu3 : ['商品类型', '自营商品', '公共商品'],
 			selectVal4 : 0,
-			show4 : false,
-			selectMenu4 : ['全部','上架', '下架'],
+			// show4 : false,
+			// selectMenu4 : ['已上架', '为上架'],
 			
 			// 侧边抽屉
 			filterHeight : 300,
@@ -105,23 +133,30 @@ export default {
 				{ name: '条件5', value: '4', checked: false },
 				{ name: '条件6', value: '5', checked: false }
 			],
-			msgs : [],//
-			goodsimg:'',
-			index: 0,
-			
-			groupGoodsList:[
-				{id:1,title:'小白菜',img:'https://fudezao.oss-cn-qingdao.aliyuncs.com/statics/uper/201909/23/5d882ce3900b7.png',
-			originalPrice:6,price:5,checked:true}],
-			
+			groupGoodsList:[],
+			smallGroupShop:{
+				img:'',
+				minPrice:'',
+				maxPrice:'',
+				title:'',
+				commonFlag:'',
+				skuId:null,
+				spuId:null,
+				status:1,
+				
+			},
+			// 上传按钮名称
 			queryData:{
 				sidx:"",//排序字段
 				order:"",//asc desc
 				categoryTitle:"",//商品分类名称
 				miniPrice:null,//最新商品价格
 				maxPrice:null,//最新商品价格
-				status:'',//上架状态
+				commonFlag:'全部',//1公共商品 0自营商品
+				page:1,		//页码
+				limit:200, //每页显示记录数
 			},
-			selectGroupId:[],//单选选中到ID数组
+			
 		}
 	},
 	onShow() {
@@ -132,36 +167,37 @@ export default {
 		var system = systemInfo.info();
 		this.filterHeight = system.windowHeight;
 		this.scrollHeight = system.windowHeight - 80;
+		
 	},
 	components:{
 		gracePage, graceSelectMenu, graceDrawer, graceSelectTags,graceSwipeList,graceShade
 	},
 	methods:{
 		init(){
-			this.getGroupGoodsList(this.queryData);//获取商品列表数据
-			this.getCategoryList();//商品分类列表
+			this.listSkuForgroup(this.queryData);//获取商品列表数据
 		},
-		//获取上架商品信息
-		getGroupGoodsList(data){
+		//获取sku列表，用于上架到 团购商品列表中
+		listSkuForgroup(data){
 			var that = this;
-			that.$api.request('shopkeeper/shopgoods', 'goodsGroupList',data,failres => {
-				that.$api.msg(failres.msg)
+			that.$api.request('shopkeeper/shopgoods', 'listForgroup',data,failres => {
+				// that.$api.msg(failres.msg)
 			}).then(res => {
-				if (res.list!=null && res.list.length>0) {
+				if (res.page.list!=null && res.page.list.length>0) {
 					var newData = [];
 					// 遍历数据 转换对象格式
-					res.list.forEach((item)=>{
+					res.page.list.forEach((item)=>{
 						item.id    = item.id;
-						item.title      = item.sku.title;
-						item.price      = item.minPrice;
-						item.originalPrice  = item.maxPrice;
-						item.img = item.sku.img;
-						item.status = item.status;
+						item.title      = item.title;
+						item.price      = item.price;
+						item.originalPrice  = item.originalPrice;
+						item.img = item.img;
+						item.upstatus = item.upstatus;
+						item.commonFlag = item.commonFlag;
 						item.checked = false;
 						newData.push(item);
 					})
 					// 转换后将数据赋值到组件
-					this.groupGoodsList = newData;
+					that.groupGoodsList = newData;
 				}else{
 					that.groupGoodsList=[];
 				}
@@ -180,71 +216,19 @@ export default {
 				that.groupGoodsList[index].status=status;
 			});
 		},
-		//批量上下架
-		updateStatusBatch(status){
-			var ids = [];
-			var indexs = [];
-			var that = this;
-			that.groupGoodsList.forEach(p=>{
-				if(p.checked)ids.push(p.id);
-			});
-			if(ids.length==0){
-				console.log("that.selectGroupId=="+JSON.stringify(that.selectGroupId));
-				if(that.selectGroupId!=null && that.selectGroupId.length>0){
-					ids = that.selectGroupId;
-				}else{
-					return;
-				}
-			}
-			var data = {
-				ids:ids,
-				status:status
-			}
-			that.$api.request('shopkeeper/shopgoods', 'updateSatusBatch',data,failres => {
-				that.$api.msg(failres.msg)
-			}).then(res => {
-				that.getGroupGoodsList();
-			});
-		},
-		//跳转添加团购商品列
-		gogroupskulist(){
-			var url = '/pages/upgoods/groupskulist';
-			uni.navigateTo({
-				url
-			})
-		},
-		//获取店铺分类列表信息
-		getCategoryList(){
-			var that = this;
-			that.$api.requestGet('shopkeeper/shopCategory', 'getGategoryList',null,failres => {
-				that.$api.msg(failres.msg)
-			}).then(res => {
-				if (res.list!=null && res.list.length>0) {
-					var newData = [];
-					// 遍历数据 转换对象格式
-					newData.push('全部');
-					res.list.forEach((item)=>{
-						newData.push(item.title);
-					})
-					// 转换后将数据赋值到组件
-					that.selectMenu3 = newData;
-				}else{
-					that.selectMenu3=[];
-				}
-			});
-		},
+		
 		// 下拉选择
 		showMenu1  : function () {this.show1 = true;},
 		closeMenu1 : function () {this.show1 = false;},
 		select1    : function (index) {
 			if(index==1){//价格降序
-				this.queryData.sidx="min_price";
+				this.queryData.sidx="price";
 				this.queryData.order="desc";
 			}else if(index==2){//价格升序
-				this.queryData.sidx="min_price";
+				this.queryData.sidx="price";
 				this.queryData.order="asc";
 			}
-			this.getGroupGoodsList(this.queryData);
+			this.listSkuForgroup(this.queryData);
 			//console.log("选择了 " + this.selectMenu1[index]);
 		},
 		showMenu2  : function () {this.show2 = true;},
@@ -261,30 +245,20 @@ export default {
 				this.queryData.miniPrice=pricearry[0];
 				this.queryData.maxPrice=pricearry[1];
 			}
-			this.getGroupGoodsList(this.queryData);
+			this.listSkuForgroup(this.queryData);
 			//console.log("选择了 " + this.selectMenu2[index]);
 		},
 		showMenu3  : function () {this.show3 = true;},
 		closeMenu3 : function () {this.show3 = false;},
 		select3    : function (index) {
 			if(index==0){
-				this.queryData.categoryTitle="";
-			}else{
-				this.queryData.categoryTitle=this.selectMenu3[index];
-			}
-			this.getGroupGoodsList(this.queryData);
-		},
-		showMenu4  : function () {this.show4 = true;},
-		closeMenu4 : function () {this.show4 = false;},
-		select4    : function (index) {
-			if(index==0){
-				this.queryData.status="";
+				this.queryData.commonFlag="";
 			}else if(index==1){
-				this.queryData.status='1';
+				this.queryData.commonFlag="0";
 			}else{
-				this.queryData.status='0';
+				this.queryData.commonFlag="1";
 			}
-			this.getGroupGoodsList(this.queryData);
+			this.listSkuForgroup(this.queryData);
 		},
 		// 条件筛选
 		openFilter : function () {
@@ -321,10 +295,6 @@ export default {
 				});
 			}
 		},
-		//单选
-		checkboxChange(e){
-			this.selectGroupId = e.detail.value;
-		},
 		//全选 或者反选
 		selectChexkbox(){
 			if(this.groupGoodsList!=null && this.groupGoodsList.length>0){
@@ -339,11 +309,41 @@ export default {
 				});
 			}
 		},
-		
-		// 列表本身被点击
-		itemTap : function (e) {
-			console.log(e);
-			uni.showToast({title:"索引"+e});
+		//添加团购商品
+		addGroupGoods(item,index){
+			// this.smallGroupShop=item;
+			this.smallGroupShop.skuId = item.id;
+			this.smallGroupShop.spuId = item.spuId;
+			this.smallGroupShop.commonFlag = item.commonFlag;
+			this.smallGroupShop.minPrice = item.price;
+			this.smallGroupShop.maxPrice = item.originalPrice;
+
+			this.showShade();
+		},
+		//保存团购商品
+		save(){
+			var that = this;
+			if(that.smallGroupShop.minPrice==null || that.smallGroupShop.minPrice==''){
+				that.$api.msg('团购价不能为空')
+				return;
+			}
+			if(that.smallGroupShop.maxPrice==null || that.smallGroupShop.maxPrice==''){
+				that.$api.msg('原价不能为空')
+				return;
+			}
+			if(Number(that.smallGroupShop.minPrice)>Number(that.smallGroupShop.maxPrice)){
+				that.$api.msg('团购价不能大于原价')
+				return;
+			}
+			
+			console.log("smallGroupShop==="+JSON.stringify(that.smallGroupShop));
+			that.$api.request('shopkeeper/shopgoods', 'saveGroupgoods',that.smallGroupShop,failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				that.$api.msg("保存成功")
+				that.listSkuForgroup(that.queryData);
+				that.closeShade();
+			});
 		},
 		/* 弹窗相关start */
 		showShade : function () {
@@ -352,19 +352,7 @@ export default {
 		closeShade : function () {
 			this.$refs.graceShade.hideIt();
 		},
-		/* 弹窗相关end */
 		
-		/* 选择图片 */
-		chooseImg() { //选择图片
-			const that = this
-			that.$api.uploadImg((res => {
-				that.spu.img = res;
-			}))
-		},
-		 bindPickerChange: function(e) {
-			console.log('picker发送选择改变，携带值为', e.target.value)
-			this.index = e.target.value
-		},
 	}
 }
 </script>
@@ -444,6 +432,7 @@ export default {
 	padding: 1rem;
 	background-color: white;
 	padding-top: 0px;
+	    font-weight: bold;
 }
 .goods-tab{
 	display: flex;
@@ -459,7 +448,23 @@ export default {
 	flex: 1;
 }
 .unite{
-	flex: 1;
+	    -webkit-box-flex: 1;
+	    -webkit-flex: 1;
+	    flex: 1;
+	    display: flex;
+	    justify-content: space-around;
+		position: relative;
+}
+.doller{
+	    display: -webkit-box;
+	    display: -webkit-flex;
+	    display: block;
+	    -webkit-box-pack: right;
+	    -webkit-justify-content: right;
+	    align-items: right;
+	    position: absolute;
+	    left: 33%;
+	    top: 0.1rem;
 }
 .grace-add-list-items-my {
     width: 100% !important; 
@@ -526,15 +531,22 @@ export default {
 	line-height: 2rem;
 }
 .skufooter{
-	position: fixed;
-	display: flex;justify-content: space-around;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: space-around;
+	justify-content: center;
 	text-align: center;
-	align-items: center;
-	border-top: 1px solid;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	align-items: self-start;
 	background: white !important;
-    bottom: 2.2rem;
 	right: 0;
 	left: 0;
+	width: 60%;
+	align-self: center;
+	margin: auto;
+	margin-top: 3rem;
 	
 	
 }

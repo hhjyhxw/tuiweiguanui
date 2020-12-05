@@ -137,6 +137,14 @@
 		        "navigationBarTitleText": "商品上架",
 		        "enablePullDownRefresh": false
 		    }
+		},
+		{
+		    "path" : "pages/upgoods/groupskulist",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "商品库列表",
+		        "enablePullDownRefresh": false
+		    }
 		}
         ,{
             "path" : "pages/shopcategory/shopcategory",
