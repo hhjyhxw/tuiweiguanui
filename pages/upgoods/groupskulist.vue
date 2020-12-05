@@ -72,6 +72,11 @@
 							<text class="doller">原价¥：</text><input type="text"  style="color: black;" v-model="smallGroupShop.maxPrice"  placeholder="单买价"/>
 						</view>
 					</view>
+					<view class="goods-tab">
+						<view class="unite">
+							<text class="doller">库存：</text><input type="text"  style="color: black;" v-model="smallGroupShop.maxPrice"  placeholder="单买价"/>
+						</view>
+					</view>
 					<view class="skufooter">
 						<button class="btn grace-bg-light-blue"  @tap.stop="closeShade">关闭</button>
 						<button class="btn grace-bg-light-blue" @tap="save">保存</button>

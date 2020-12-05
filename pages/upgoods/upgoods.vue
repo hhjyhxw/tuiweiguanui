@@ -95,7 +95,7 @@
 		<view slot="gFooter" style="z-index: 0;">
 			<view class="footer">
 				<view class="footertext">共20个商品</view>
-				<button class="btn" @tap="showShade">上传商品</button>
+				<button class="btn" @tap="addSpu">上传商品</button>
 			</view>
 		</view>
 	</gracePage>
@@ -368,6 +368,20 @@ export default {
 			// console.log(e);
 			// uni.showToast({title:"索引"+e});
 		},
+		//上传商品
+		addSpu(){
+			this.spu = {
+				title:'',
+				img:'',
+				detail:'',
+				unit:'',
+				categoryId:null,
+				price:0,
+				originalPrice:0
+			},
+			this.skulist=[],
+			this.showShade();
+		},
 		/* 弹窗相关start */
 		showShade : function () {
 			this.$refs.graceShade.showIt();
@@ -400,6 +414,9 @@ export default {
 				price:null,
 				stock:20,
 				remainStock:0
+			}
+			if(this.skulist!=null && this.skulist.length>3){
+				return;
 			}
 			this.skulist.push(item);
 			//skulist:[{id:1,title:'番茄',unit:'克',originalPrice:25,price:20,stock:20}],

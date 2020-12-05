@@ -82,7 +82,7 @@
 							</view>
 							<text class="grace-list-arrow-right grace-icons icon-arrow-right"></text>
 						</view>
-						<view class="grace-list-items">
+						<view class="grace-list-items" @click="navigo('/pages/shopadd/shopadd')">
 							<text class="grace-list-icon grace-icons icon-user grace-red"></text>
 							<view class="grace-list-body">
 								<view class="grace-list-title">

@@ -167,12 +167,11 @@
         }
         ,{
             "path" : "pages/shopadd/shopadd",
-           "style" : {
-           		"titleNView" : false,
-           		"bounce" : "none",
-           		"scrollIndicator" : "none",
-           		"navigationStyle" : "custom"
-           	}
+           "style" :
+           {
+               "navigationBarTitleText": "广告维护",
+               "enablePullDownRefresh": false
+           }
             
         }
         ,{

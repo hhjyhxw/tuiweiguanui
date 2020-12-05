@@ -1,17 +1,24 @@
 <template>
 	
-	<gracePage :customHeader="true" :bounding="false">
-		<view class="grace-header-body" slot="gHeader">
+	<gracePage :customHeader="false" :bounding="false">
+		<!-- <view class="grace-header-body" slot="gHeader">
 			<view class="myhearder">
 				<image class="myhearder-goback" src="../../static/goback.png" @click="goback"></image>
 				<text class="myhearder-text">广告维护</text>
 				<image class="myhearder-add" src="../../static/add.png" @click="showShade"></image>
 			</view>	
-		</view>
+		</view> -->
+		
 		<!-- 页面主体 -->
-		<view slot="gBody">
-			<view class="grace-nowrap grace-flex-vcenter grace-border-b" 
-			style="background:#F6F7F8;">
+		<view slot="gBody" style="padding: 0 2rem;">
+			<view class="myhearder">
+				<view>
+					<button type="primary" class="grace-button" style="right: 3rem;" size="mini"  @click="showShade" >添加</button>
+				</view>
+			</view>	
+			
+			<view class="grace-nowrap grace-flex-vcenter grace-border-b grace-flex-vcenter grace-bg-white" 
+			>
 				<view class="graceSelectMenuItem">
 					<graceSelectMenu 
 					:show="show1" :items="selectMenu1" @showMenu="showMenu1" @close="closeMenu1" @select="select1"></graceSelectMenu>
@@ -24,116 +31,40 @@
 				</view>
 			</view>
 			<view  class="shopcoupon" v-for="(item,index) in adslist" :key="index" :data-index="index" :data-number="item.number" :data-btn="item.btn" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
-				<image :src="item.img" style="width: 100%;height: 8rem;"></image>
+				<image :src="item.adImgurl" style="width: 100%;height: 12.2rem;"></image>
 				<view class="btngroup" v-show="item.isshowbtn">
 					<button type="default" class="btngroup-btn" size="" @click="upone($event,index)">向上</button>
 					<button type="default" class="btngroup-btn" size="" @click="downone($event,index)">向下</button>
-					<button type="default" class="btngroup-btn" size=""  @click="toupdatestatus($event,index)">开启</button>
+					<button type="default" class="btngroup-btn" size="" v-show="item.status==1"  @click="toupdatestatus($event,index,'0')">关闭</button>
+					<button type="default" class="btngroup-btn" size="" v-show="item.status!=1"  @click="toupdatestatus($event,index,'1')">开启</button>
 					<button type="default" class="btngroup-btn" size=""  @click="toedite($event,index)">编辑</button>
 					<button type="default" class="btngroup-btn" size=""  @click="todel($event,index)">删除</button>
 				</view>
 			</view>
-		<!-- 	<view class="shopcoupon" v-for="(item, index) in coupons" :key="index" :data-index="index" :data-number="item.number" :data-btn="item.btn" style="margin:15px 0;" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
-				<graceCoupons :coupon="item"></graceCoupons>
-				<view class="btngroup" v-show="item.isshowbtn">
-					<button type="default" class="btngroup-btn" size="" @click="upone($event,index)">向上</button>
-					<button type="default" class="btngroup-btn" size="" @click="downone($event,index)">向下</button>
-					<button type="default" class="btngroup-btn" size=""  @click="toupdatestatus($event,index)">开启</button>
-					<button type="default" class="btngroup-btn" size=""  @click="toedite($event,index)">编辑</button>
-					<button type="default" class="btngroup-btn" size=""  @click="todel($event,index)">删除</button>
-				</view>
-			</view> -->
-			
 			
 			<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
 			<graceShade @closeShade="closeShade" ref="graceShade">
 				<view class="addgoods-box grace-relative" @tap.stop="">
-					<view class="tan-box-titile">优惠券</view>
+					<view class="tan-box-titile">广告维护</view>
 					<form class="grace-form">
 								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">优惠券名称</text>
+									<text class="grace-form-label">广告名称</text>
 									<view class="grace-form-body">
-										<input type="text" class="grace-form-input" name="name1" placeholder="请输入优惠券名称" />
+										<input type="text" class="grace-form-input" name="adName" v-model="ads.adName" placeholder="请输入优惠券名称" />
 									</view>
 								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">使用限制</text>
-									<view class="grace-form-body" style="padding:20rpx 0;">
-										<radio-group name="danxuan">
-											<label class="grace-check-item-v"><radio value="1"></radio>新用户</label>
-											<label class="grace-check-item-v"><radio value="2"></radio>不限</label>
-										</radio-group>
-									</view>
-								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">优惠券类型</text>
-									<view class="grace-form-body" style="padding:20rpx 0;">
-										<radio-group name="danxuan">
-											<label class="grace-check-item-v"><radio value="1"></radio>满减券</label>
-											<label class="grace-check-item-v"><radio value="2"></radio>折扣券</label>
-										</radio-group>
-									</view>
-								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">每人限领</text>
-									<view class="grace-form-body">
-										<input type="number" class="grace-form-input" name="name1" placeholder="每人限领" />
-									</view>
-								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">投放数量</text>
-									<view class="grace-form-body">
-										<input type="number" class="grace-form-input" name="name1" placeholder="请输入投放数量" />
-									</view>
-								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">最低消费</text>
-									<view class="grace-form-body">
-										<input type="number" class="grace-form-input" name="name1" placeholder="请输入最低消费" />
-									</view>
-								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">优惠金额</text>
-									<view class="grace-form-body">
-										<input type="number" class="grace-form-input" name="name1" placeholder="请输优惠金额" />
-									</view>
-								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">使用对象</text>
-									<view class="grace-form-body">
-										<picker class="grace-form-picker" @change="bindPickerChange" :value="genderIndex" :range="gender" name="gender">
-											<text class="grace-text">{{gender[genderIndex]}}</text>
-											<text class="grace-icons icon-arrow-down" style="margin-left:5px;"></text>
-										</picker>
-									</view>
-								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">开始日期</text>
-									<view class="grace-form-body">
-										<graceDateTime @confirm="confirm1" :value="demo1Val" @change="chang1">
-											<text class="demo grace-border-radius">{{demo1Val}}<text class="grace-icons icon-date icon-left-margin"></text></text>
-										</graceDateTime>
-									</view>
-								</view>
-								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">结束日期</text>
-									<view class="grace-form-body">
-										<graceDateTime @confirm="confirm2" :value="demo2Val" @change="chang1">
-											<text class="demo grace-border-radius">{{demo2Val}}<text class="grace-icons icon-date icon-left-margin"></text></text>
-										</graceDateTime>
-									</view>
-								</view>
-														
 								<view class="grace-form-item">
-									<text class="grace-form-label">详情</text>
-									<view class="grace-form-body" style="padding:20rpx 0;">
-										<textarea class="grace-textarea" value="" placeholder="详情" />
+									<text class="grace-form-label">广告图片</text>
+									<!-- 图片选择  -->
+									<view class="goods-imgbox">
+										<button class="goods-imgbox-icon grace-bg-light-blue" v-if="ads.adImgurl==''" @tap="chooseImg()">+添加图片</button>
+										<image class="goods-msg-in" :src="ads.adImgurl" @tap="chooseImg()"/>
 									</view>
 								</view>
 							</form>
 					<view class="skufooter">
-						<button class="btn"  @tap.stop="closeShade">关闭</button>
-						<button class="btn" @tap="save">保存</button>
+						<button class="btn grace-bg-light-blue"  @tap.stop="closeShade">关闭</button>
+						<button class="btn grace-bg-light-blue" @tap="saveads">保存</button>
 					</view>
 				</view>
 			</graceShade>
@@ -157,24 +88,7 @@ export default {
 			show2               : false,
 			selectIndex2        : 1,
 			selectMenu2         : ['全部','开启','关闭'],
-			coupons: [
-				{
-					color : '#9F6DFA', ltBg : "#FFFFFF", height : '180rpx',
-					unit:"￥", number:5, txt:"满50元可用", title:"全场通用券", desc:"有效期至 2018-05-20",
-					btn : "领取", drawed : "已抢2100张" ,"isshowbtn":false
-				},
-				{
-					color : '#FF3456', ltBg : "#FFFFFF", height : '180rpx',
-					unit:"￥", number:10, txt:"满50元可用", title:"电器专场用券", desc:"有效期至 2018-05-28",
-					btn : "已领取", drawed : "已抢2800张" ,"isshowbtn":false
-				},
-				{
-					color : '#FF8830', ltBg : "#FFFFFF", height : '180rpx',
-					unit:"￥", number:100, txt:"满500元可用", title:"服饰专场用券", desc:"有效期至 2018-05-28",
-					btn : "领券","isshowbtn":false
-				}
-			],
-			adslist:[{id:1,title:'',img:'../../static/temp/baner1.jpg',isshowbtn:false},{id:2,title:'',img:'../../static/missing-face.png',isshowbtn:false}],
+			adslist:[],
 			
 			/* 移动所需参数 */
 			startX: 0,
@@ -187,29 +101,89 @@ export default {
 			genderIndex : 0,
 			demo1Val:"请选择具体时间",
 			demo2Val:"请选择具体日期",
-			
+			queryData:{
+				sidx:'',
+				order:'',
+				status:'',
+			},
+			ads:{
+				adName:'',
+				adImgurl:'',
+				status:1,
+			},
 			
 		}
 	},
 	onLoad : function () {
 		
 	},
+	onShow() {
+		this.getAdsList(this.queryData);	
+	},
 	components:{
 		gracePage, graceSelectMenu,graceCoupons,graceShade,graceDateTime
 	},
 	methods:{
+		
+		//获取广告列表列表
+		getAdsList(data){
+			var that = this;
+			that.$api.request('shopkeeper/shopAds','adsList',data,failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				that.adslist = res.list;
+				if(that.adslist!=null && that.adslist.length>0){
+					that.adslist.forEach(p=>{
+						p.isshowbtn = false;
+					})
+				}
+			});
+		},
+		//保存广告
+		saveads(){
+			var that = this;
+			that.$api.request('shopkeeper/shopAds','saveAds',that.ads,failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				that.$api.msg('保存成功');
+				that.closeShade();
+				that.getAdsList(that.queryData);
+			});
+		},
+		/* 选择图片 */
+		chooseImg() { //选择图片
+			const that = this
+			that.$api.uploadImg((res => {
+				that.ads.adImgurl = res;
+			}))
+		},
 		goback : function () { uni.navigateBack({}); },
 		showMenu1  : function () {this.show1 = true;},
 		closeMenu1 : function () {this.show1 = false;},
 		select1    : function (index) {
-			console.log("选择了 " + this.selectMenu1[index]);
+			if(index==0){
+				this.queryData.sidx = '';
+				this.queryData.order = '';
+			}else if(index==1){
+				this.queryData.sidx = 'ad_name';
+				this.queryData.order = 'asc';
+			}else{
+				this.queryData.sidx = 'ad_name';
+				this.queryData.order = 'desc';
+			}
+			this.getAdsList(this.queryData);
 		},
 		showMenu2  : function () {this.show2 = true;},
 		closeMenu2 : function () {this.show2 = false;},
 		select2    : function (index) {
-			console.log("选择了 " + this.selectMenu2[index]);
-			// 如何对应获取后端 api 的值
-			console.log(this.selectMenu2FromApi[index]);
+			if(index==0){
+				this.queryData.status = '';
+			}else if(index==1){
+				this.queryData.status = '1';
+			}else{
+				this.queryData.status = '0';
+			}
+			this.getAdsList(this.queryData);
 		},
 		// 第三个菜单
 		getIt : function(e){
@@ -249,6 +223,9 @@ export default {
 						//向左
 						this.isshowbtn = true;
 						var index = e.currentTarget.dataset.index;
+						this.adslist.forEach(p=>{
+							p.isshowbtn = false;
+						})
 						this.adslist[index].isshowbtn=true;
 						console.log('向左');
 					} else if (Y > 0 && Math.abs(Y) > Math.abs(X)) {
@@ -277,6 +254,8 @@ export default {
 				this.adslist[index]=this.adslist[index-1];
 				this.adslist[index].isshowbtn	 = false;
 				this.adslist[index-1]=temp;
+				
+				this.updateSort();
 			},
 			//往下移动
 			downone(event,index){
@@ -290,20 +269,56 @@ export default {
 				this.adslist[index]=this.adslist[index+1];
 				this.adslist[index].isshowbtn = false;
 				this.adslist[index+1]=temp;
+				
+				this.updateSort();
+			},
+			updateSort(){
+				var ids = [];
+				var sortNum = [];
+				for (var i = 0; i < this.adslist.length; i++) {
+					ids.push(this.adslist[i].id);
+					sortNum.push(i);
+				}
+				var data ={
+					ids:ids,
+					sortNum:sortNum
+				};
+				var that = this;
+				that.$api.request('shopkeeper/shopAds','updateSortBatch',data,failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.getAdsList(that.queryData);
+				});
 			},
 			//去编辑
 			toedite(event,index){
 				event.stopPropagation();
+				this.ads = this.adslist[index];
+				this.showShade();
 				
 			},
 			//去开启或者关闭
-			toupdatestatus(event,index){
+			toupdatestatus(event,index,status){
 				event.stopPropagation();
-				
+				var ads = this.adslist[index];
+				ads.status = status;
+				var that = this;
+				that.$api.request('shopkeeper/shopAds','saveAds',ads,failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.adslist[index].status=status;
+				});
 			},
 			//去删除
 			todel(event,index){
 				event.stopPropagation();
+				var that = this;
+				var id = that.adslist[index].id;
+				that.$api.requestGet('shopkeeper/shopAds','delAds',{id,id},failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.adslist.splice(index,1);
+				});
 				
 			},
 			/* 弹窗相关start */
@@ -329,7 +344,7 @@ export default {
 	.myhearder{
 		display: flex;
 		padding: 0.5rem;
-		justify-content:space-between;
+		justify-content:flex-end;
 		align-items: center;
 		width: 100%;
 	}
@@ -344,10 +359,11 @@ export default {
 		position: relative;
 		right: 0px;
 	}
-.graceSelectMenuItem{width:200rpx; line-height:90rpx;}
+.graceSelectMenuItem{width:330rpx !important; line-height:90rpx;}
 
 .shopcoupon{
 	position: relative;
+	border-bottom: 1px solid lightgray;
 }
 .btngroup{
 	position: absolute;
@@ -356,11 +372,11 @@ export default {
 	z-index: 2;
 }
 .btngroup-btn{
-	    width: 3.5rem;
-	    height: 1.5rem;
-	    text-align: center;
-	    line-height: 1.5rem;
-	    font-size: 12px;
+	   width: 5.5rem;
+	   height: 2.5rem;
+	   text-align: center;
+	   line-height: 2.5rem;
+	   font-size: 12px;
 }
 
 .grace-shade{
@@ -398,17 +414,22 @@ export default {
 	line-height: 41px !important;
 }
 .skufooter{
-	position: fixed;
-	display: flex;justify-content: space-around;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: space-around;
+	justify-content: center;
 	text-align: center;
-	align-items: center;
-	border-top: 1px solid;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	align-items: self-start;
 	background: white !important;
-	 bottom: 2.2rem;
 	right: 0;
 	left: 0;
-	
-	
+	width: 60%;
+	align-self: center;
+	margin: auto;
+	margin-top: 3rem;
 }
 .skufooter .btn{
 		width: 80%;
@@ -416,4 +437,42 @@ export default {
 		background: #white !important;
 	}
 
+.goods-add-icon{
+	font-size: 44px;
+	height: 44px;
+	line-height: 44px;
+	margin-bottom: 11px;
+	color: #999999;
+}
+.goods-imgbox{
+	    position: relative;
+	    padding: 1rem;
+	    width: 100%;
+	    border: 1px solid lightgray;
+}
+.goods-imgbox-icon{
+	position: absolute;
+	top: 6rem;
+	left: 37%;
+}
+.goods-msg-in{
+	    width: 100%;
+	    height: 240px;
+	    display: block;
+	    overflow: hidden;
+	    position: relative;
+	    margin: auto;
+		/* border-bottom: 1px solid lightgray; */
+}
+.goods-title{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 1rem;
+	background-color: white;
+	padding-top: 0px;
+}
+.grace-form-input{
+	text-align: center !important;
+}
 </style>
