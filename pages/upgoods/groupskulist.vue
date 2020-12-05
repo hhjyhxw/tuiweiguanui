@@ -45,7 +45,7 @@
 									<view class="groupgoods-originalPrice">原价:￥{{item.originalPrice}}</view>
 								</view>
 								<view v-show="item.upstatus==0" @click="addGroupGoods(item,index)"><button type="default" class="grace-button grace-bg-red" size="mini">去发布</button></view>
-								<view v-show="item.upstatus==1"><button type="default" class="grace-button" size="mini">已发布</button></view>
+								<view v-show="item.upstatus==1" @click="addGroupGoods(item,index)"><button type="default" class="grace-button" size="mini">已发布</button></view>
 							</label>
 						</checkbox-group>
 					</view>
@@ -316,6 +316,8 @@ export default {
 			this.smallGroupShop.spuId = item.spuId;
 			this.smallGroupShop.commonFlag = item.commonFlag;
 			this.smallGroupShop.minPrice = item.price;
+			this.smallGroupShop.title = item.title;
+			this.smallGroupShop.img = item.img;
 			this.smallGroupShop.maxPrice = item.originalPrice;
 
 			this.showShade();
@@ -463,7 +465,7 @@ export default {
 	    -webkit-justify-content: right;
 	    align-items: right;
 	    position: absolute;
-	    left: 33%;
+	    left: 25%;
 	    top: 0.1rem;
 }
 .grace-add-list-items-my {
