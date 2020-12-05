@@ -32,7 +32,9 @@
 				<view class="btngroup" v-show="item.isshowbtn">
 					<button type="default" class="btngroup-btn" size="" @click="upone($event,index)">向上</button>
 					<button type="default" class="btngroup-btn" size="" @click="downone($event,index)">向下</button>
-					<button type="default" class="btngroup-btn" size=""  @click="toupdatestatus($event,index)">开启</button>
+					<!-- <button type="default" class="btngroup-btn" size=""  @click="toupdatestatus($event,index)">开启</button> -->
+					<button type="default" class="btngroup-btn" size="" v-show="item.status==1"  @click="toupdatestatus($event,index,'0')">关闭</button>
+					<button type="default" class="btngroup-btn" size="" v-show="item.status!=1"  @click="toupdatestatus($event,index,'1')">开启</button>
 					<button type="default" class="btngroup-btn" size=""  @click="toedite($event,index)">编辑</button>
 					<button type="default" class="btngroup-btn" size=""  @click="todel($event,index)">删除</button>
 				</view>
@@ -53,16 +55,16 @@
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">使用限制</text>
 									<view class="grace-form-body" style="padding:20rpx 0;">
-										<radio-group name="danxuan">
-											<label class="grace-check-item-v"><radio value="1" v-model="smallCoupon.surplus"></radio>新用户</label>
-											<label class="grace-check-item-v"><radio value="0" v-model="smallCoupon.surplus"></radio>不限</label>
+										<radio-group name="danxuan" @change="surplusRadioChange">
+											<label class="grace-check-item-v"><radio :value="1" v-model="smallCoupon.surplus"></radio>新用户</label>
+											<label class="grace-check-item-v"><radio :value="0" v-model="smallCoupon.surplus"></radio>不限</label>
 										</radio-group>
 									</view>
 								</view>
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">优惠券类型</text>
 									<view class="grace-form-body" style="padding:20rpx 0;">
-										<radio-group name="danxuan">
+										<radio-group name="danxuan" @change="coupTypeRadioChange">
 											<label class="grace-check-item-v"><radio value="1" v-model="smallCoupon.coupType"></radio>满减券</label>
 											<label class="grace-check-item-v"><radio value="0" v-model="smallCoupon.coupType"></radio>折扣券</label>
 										</radio-group>
@@ -197,19 +199,43 @@ export default {
 				validateType:1,//有效期类型（0 领取后开始有效天数，1设置自定义有效期范围）
 				startTime:"请选择开始日期",//有效开始日期
 				endTime:"请选择结束日期",//有效结束日期
+			},
+			queryData:{
+				sidx:'',
+				order:'',
+				status:'',
 				
-			}
+			},
 			
 		}
 	},
 	onLoad : function () {
 		
 	},
+	onShow() {
+		this.getCouponList(this.queryData);	
+	},
 	components:{
 		gracePage, graceSelectMenu,graceCoupons,graceShade,graceDateTime
 	},
 	methods:{
-		
+		//获取广告列表列表
+		getCouponList(data){
+			var that = this;
+			that.$api.request('shopkeeper/shopCoupon','couponList',data,failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				if(res.page.list!=null && res.page.list.length>0){
+					that.coupons = res.page.list;
+				}
+				// that.adslist = res.list;
+				// if(that.adslist!=null && that.adslist.length>0){
+				// 	that.adslist.forEach(p=>{
+				// 		p.isshowbtn = false;
+				// 	})
+				// }
+			});
+		},
 		//保存优惠卷
 		save(){
 			var that = this;
@@ -219,22 +245,44 @@ export default {
 				that.$api.msg('保存成功');
 				// that.closeShade();
 				that.smallCoupon = res.smallCoupon;
-				// that.getAdsList(that.queryData);
+				that.getCouponList(that.queryData);
 			});
 		},
-		
+		//
+		surplusRadioChange(e){
+			// var surplus_val = e.target.value
+			console.log("surplus_val======"+JSON.stringify(e))
+		},
+		coupTypeRadioChange(e){
+			var coupType_val = e.target.value
+		},
 		goback : function () { uni.navigateBack({}); },
 		showMenu1  : function () {this.show1 = true;},
 		closeMenu1 : function () {this.show1 = false;},
 		select1    : function (index) {
-			console.log("选择了 " + this.selectMenu1[index]);
+			if(index==0){
+				this.queryData.sidx = '';
+				this.queryData.order = '';
+			}else if(index==1){
+				this.queryData.sidx = 'title';
+				this.queryData.order = 'asc';
+			}else{
+				this.queryData.sidx = 'title';
+				this.queryData.order = 'desc';
+			}
+			this.getCouponList()(this.queryData);
 		},
 		showMenu2  : function () {this.show2 = true;},
 		closeMenu2 : function () {this.show2 = false;},
 		select2    : function (index) {
-			console.log("选择了 " + this.selectMenu2[index]);
-			// 如何对应获取后端 api 的值
-			console.log(this.selectMenu2FromApi[index]);
+			if(index==0){
+				this.queryData.status = '';
+			}else if(index==1){
+				this.queryData.status = '1';
+			}else{
+				this.queryData.status = '0';
+			}
+			this.getCouponList(this.queryData);
 		},
 		// 第三个菜单
 		getIt : function(e){
@@ -274,6 +322,10 @@ export default {
 						//向左
 						this.isshowbtn = true;
 						var index = e.currentTarget.dataset.index;
+						// this.coupons[index].isshowbtn=true;
+						this.coupons.forEach(p=>{
+							p.isshowbtn = false;
+						});
 						this.coupons[index].isshowbtn=true;
 						console.log('向左');
 					} else if (Y > 0 && Math.abs(Y) > Math.abs(X)) {
@@ -302,6 +354,8 @@ export default {
 				this.coupons[index]=this.coupons[index-1];
 				this.coupons[index].isshowbtn	 = false;
 				this.coupons[index-1]=temp;
+				
+				this.updateSort();
 			},
 			//往下移动
 			downone(event,index){
@@ -315,21 +369,65 @@ export default {
 				this.coupons[index]=this.coupons[index+1];
 				this.coupons[index].isshowbtn = false;
 				this.coupons[index+1]=temp;
+				
+				this.updateSort();
+			},
+			updateSort(){
+				var ids = [];
+				var sortNum = [];
+				for (var i = 0; i < this.coupons.length; i++) {
+					ids.push(this.coupons[i].id);
+					sortNum.push(i);
+				}
+				var data ={
+					ids:ids,
+					sortNum:sortNum
+				};
+				var that = this;
+				that.$api.request('shopkeeper/shopCoupon','updateSortBatch',data,failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.getCouponList(that.queryData);
+				});
 			},
 			//去编辑
 			toedite(event,index){
 				event.stopPropagation();
-				
+				var item = this.coupons[index];
+				var that = this;
+				that.$api.requestGet('shopkeeper/shopCoupon','counpInfo',{id:item.id},failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					console.log("res=="+JSON.stringify(res))
+					that.smallCoupon = res.smallCoupon;
+					this.showShade();
+				});
 			},
 			//去开启或者关闭
-			toupdatestatus(event,index){
+			toupdatestatus(event,index,status){
 				event.stopPropagation();
-				
+				var item = this.coupons[index];
+				var smallCoupon = {
+					id:item.id,
+					status:status
+				};
+				var that = this;
+				that.$api.request('shopkeeper/shopCoupon','updateCouponStatus',smallCoupon,failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.coupons[index].status=status;
+				});
 			},
 			//去删除
 			todel(event,index){
 				event.stopPropagation();
-				
+				var that = this;
+				var id = that.coupons[index].id;
+				that.$api.requestGet('shopkeeper/shopCoupon','delCounp',{id,id},failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.coupons.splice(index,1);
+				});
 			},
 			/* 弹窗相关start */
 			showShade : function () {
