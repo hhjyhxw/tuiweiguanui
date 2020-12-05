@@ -11,11 +11,11 @@
 		
 		<!-- 页面主体 -->
 		<view slot="gBody" style="padding: 0 2rem;">
-			<view class="myhearder">
+			<!-- <view class="myhearder">
 				<view>
 					<button type="primary" class="grace-button" style="right: 3rem;" size="mini"  @click="showShade" >添加</button>
 				</view>
-			</view>	
+			</view>	 -->
 			
 			<view class="grace-nowrap grace-flex-vcenter grace-border-b grace-flex-vcenter grace-bg-white" 
 			>
@@ -28,6 +28,9 @@
 					<graceSelectMenu 
 					:show="show2" :height="300" :selectIndex="selectIndex2" :items="selectMenu2" 
 					@showMenu="showMenu2" @close="closeMenu2" @select="select2"></graceSelectMenu>
+				</view>
+				<view class="graceSelectMenuItem">
+						<button type="default" class="grace-button grace-bg-light-blue" size="mini"  @click="showShade" >添加</button>
 				</view>
 			</view>
 			<view  class="shopcoupon" v-for="(item,index) in adslist" :key="index" :data-index="index" :data-number="item.number" :data-btn="item.btn" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
@@ -359,7 +362,13 @@ export default {
 		position: relative;
 		right: 0px;
 	}
-.graceSelectMenuItem{width:330rpx !important; line-height:90rpx;}
+.graceSelectMenuItem{
+	width: 216rpx;
+	line-height: 90rpx;
+	display: flex;
+	padding-left: 1rem;
+	justify-content: space-around;
+}
 
 .shopcoupon{
 	position: relative;

@@ -1,13 +1,13 @@
 <template>
 	
-	<gracePage :customHeader="true" :bounding="false">
-		<view class="grace-header-body" slot="gHeader">
+	<gracePage :customHeader="false" :bounding="false">
+		<!-- <view class="grace-header-body" slot="gHeader">
 			<view class="myhearder">
 				<image class="myhearder-goback" src="../../static/goback.png" @click="goback"></image>
 				<text class="myhearder-text">优惠券</text>
 				<image class="myhearder-add" src="../../static/add.png" @click="showShade"></image>
 			</view>	
-		</view>
+		</view> -->
 		<!-- 页面主体 -->
 		<view slot="gBody">
 			<view class="grace-nowrap grace-flex-vcenter grace-border-b" 
@@ -21,6 +21,9 @@
 					<graceSelectMenu 
 					:show="show2" :height="300" :selectIndex="selectIndex2" :items="selectMenu2" 
 					@showMenu="showMenu2" @close="closeMenu2" @select="select2"></graceSelectMenu>
+				</view>
+				<view class="graceSelectMenuItem">
+						<button type="default" class="grace-button grace-bg-light-blue" size="mini"  @click="showShade" >添加</button>
 				</view>
 			</view>
 			
@@ -44,15 +47,15 @@
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">优惠券名称</text>
 									<view class="grace-form-body">
-										<input type="text" class="grace-form-input" name="name1" placeholder="请输入优惠券名称" />
+										<input type="text" class="grace-form-input" v-model="smallCoupon.title" placeholder="请输入优惠券名称" />
 									</view>
 								</view>
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">使用限制</text>
 									<view class="grace-form-body" style="padding:20rpx 0;">
 										<radio-group name="danxuan">
-											<label class="grace-check-item-v"><radio value="1"></radio>新用户</label>
-											<label class="grace-check-item-v"><radio value="2"></radio>不限</label>
+											<label class="grace-check-item-v"><radio value="1" v-model="smallCoupon.surplus"></radio>新用户</label>
+											<label class="grace-check-item-v"><radio value="0" v-model="smallCoupon.surplus"></radio>不限</label>
 										</radio-group>
 									</view>
 								</view>
@@ -60,37 +63,37 @@
 									<text class="grace-form-label">优惠券类型</text>
 									<view class="grace-form-body" style="padding:20rpx 0;">
 										<radio-group name="danxuan">
-											<label class="grace-check-item-v"><radio value="1"></radio>满减券</label>
-											<label class="grace-check-item-v"><radio value="2"></radio>折扣券</label>
+											<label class="grace-check-item-v"><radio value="1" v-model="smallCoupon.coupType"></radio>满减券</label>
+											<label class="grace-check-item-v"><radio value="0" v-model="smallCoupon.coupType"></radio>折扣券</label>
 										</radio-group>
 									</view>
 								</view>
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">每人限领</text>
 									<view class="grace-form-body">
-										<input type="number" class="grace-form-input" name="name1" placeholder="每人限领" />
+										<input type="number" class="grace-form-input" v-model="smallCoupon.limits" placeholder="每人限领" />
 									</view>
 								</view>
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">投放数量</text>
 									<view class="grace-form-body">
-										<input type="number" class="grace-form-input" name="name1" placeholder="请输入投放数量" />
+										<input type="number" class="grace-form-input" v-model="smallCoupon.total" placeholder="请输入投放数量" />
 									</view>
 								</view>
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">最低消费</text>
 									<view class="grace-form-body">
-										<input type="number" class="grace-form-input" name="name1" placeholder="请输入最低消费" />
+										<input type="number" class="grace-form-input" v-model="smallCoupon.min" placeholder="请输入最低消费" />
 									</view>
 								</view>
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">优惠金额</text>
 									<view class="grace-form-body">
-										<input type="number" class="grace-form-input" name="name1" placeholder="请输优惠金额" />
+										<input type="number" class="grace-form-input" v-model="smallCoupon.discount" placeholder="请输优惠金额" />
 									</view>
 								</view>
 								<view class="grace-form-item grace-border-b">
-									<text class="grace-form-label">使用对象</text>
+									<text class="grace-form-label">使用分类</text>
 									<view class="grace-form-body">
 										<picker class="grace-form-picker" @change="bindPickerChange" :value="genderIndex" :range="gender" name="gender">
 											<text class="grace-text">{{gender[genderIndex]}}</text>
@@ -101,16 +104,19 @@
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">开始日期</text>
 									<view class="grace-form-body">
-										<graceDateTime @confirm="confirm1" :value="demo1Val" @change="chang1">
-											<text class="demo grace-border-radius">{{demo1Val}}<text class="grace-icons icon-date icon-left-margin"></text></text>
+										<graceDateTime @confirm="confirm1" :value="smallCoupon.startTime" @change="chang1">
+											<text class="demo grace-border-radius">{{smallCoupon.startTime}}<text class="grace-icons icon-date icon-left-margin"></text></text>
 										</graceDateTime>
 									</view>
 								</view>
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">结束日期</text>
 									<view class="grace-form-body">
-										<graceDateTime @confirm="confirm2" :value="demo2Val" @change="chang1">
+										<!-- <graceDateTime @confirm="confirm2" :value="demo2Val" @change="chang1">
 											<text class="demo grace-border-radius">{{demo2Val}}<text class="grace-icons icon-date icon-left-margin"></text></text>
+										</graceDateTime> -->
+										<graceDateTime @confirm="confirm2" :value="smallCoupon.endTime" @change="chang1">
+											<text class="demo grace-border-radius">{{smallCoupon.endTime}}<text class="grace-icons icon-date icon-left-margin"></text></text>
 										</graceDateTime>
 									</view>
 								</view>
@@ -118,17 +124,17 @@
 								<view class="grace-form-item">
 									<text class="grace-form-label">详情</text>
 									<view class="grace-form-body" style="padding:20rpx 0;">
-										<textarea class="grace-textarea" value="" placeholder="详情" />
+										<textarea class="grace-textarea" value="" placeholder="详情" v-model="smallCoupon.description"/>
 									</view>
 								</view>
 							</form>
 					<view class="skufooter">
-						<button class="btn"  @tap.stop="closeShade">关闭</button>
-						<button class="btn" @tap="save">保存</button>
+						<button class="btn grace-bg-light-blue"  @tap.stop="closeShade">关闭</button>
+						<button class="btn grace-bg-light-blue" @tap="save">保存</button>
 					</view>
 				</view>
 			</graceShade>
-		</view>
+		</view>	
 	</gracePage>
 </template>
 <script>
@@ -175,8 +181,24 @@ export default {
 			isshowbtn:false,
 			gender : ['选择使用对象', '男', '女'],
 			genderIndex : 0,
-			demo1Val:"请选择具体时间",
-			demo2Val:"请选择具体日期",
+			
+			smallCoupon:{
+				title:'',
+				coupType:1,//0折扣卷 1 满减卷
+				description:'',//详细描述
+				total:50,//头发量
+				freezeStore:0,//已使用量
+				surplus:0,//0 不限用户 1新用户
+				limits:1,//没人限领
+				min:0,//最低消费金额
+				discount:0,//优惠金额
+				status:1,//0停用 1使用
+				categoryId:null,//分类可用
+				validateType:1,//有效期类型（0 领取后开始有效天数，1设置自定义有效期范围）
+				startTime:"请选择开始日期",//有效开始日期
+				endTime:"请选择结束日期",//有效结束日期
+				
+			}
 			
 		}
 	},
@@ -187,6 +209,20 @@ export default {
 		gracePage, graceSelectMenu,graceCoupons,graceShade,graceDateTime
 	},
 	methods:{
+		
+		//保存优惠卷
+		save(){
+			var that = this;
+			that.$api.request('shopkeeper/shopCoupon','saveCoupon',that.smallCoupon,failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				that.$api.msg('保存成功');
+				// that.closeShade();
+				that.smallCoupon = res.smallCoupon;
+				// that.getAdsList(that.queryData);
+			});
+		},
+		
 		goback : function () { uni.navigateBack({}); },
 		showMenu1  : function () {this.show1 = true;},
 		closeMenu1 : function () {this.show1 = false;},
@@ -306,10 +342,10 @@ export default {
 				console.log(e);
 			},
 			confirm1:function (res) {
-				this.demo1Val = res[0]+'-'+res[1]+'-'+res[2]+' '+res[3]+':'+res[4]+':'+res[5];
+				this.smallCoupon.startTime = res[0]+'-'+res[1]+'-'+res[2]+' '+res[3]+':'+res[4]+':'+res[5];
 			},
 			confirm2:function (res) {
-				this.demo2Val = res[0]+'-'+res[1]+'-'+res[2]+' '+res[3]+':'+res[4]+':'+res[5];
+				this.smallCoupon.endTime = res[0]+'-'+res[1]+'-'+res[2]+' '+res[3]+':'+res[4]+':'+res[5];
 			}
 	}
 }
@@ -333,22 +369,28 @@ export default {
 		position: relative;
 		right: 0px;
 	}
-.graceSelectMenuItem{width:200rpx; line-height:90rpx;}
+.graceSelectMenuItem{
+	    width: 216rpx;
+	    line-height: 90rpx;
+	    display: flex;
+	    padding-left: 1rem;
+	    justify-content: space-around;
+}
 
 .shopcoupon{
 	position: relative;
 }
 .btngroup{
 	position: absolute;
-	top: 0;
+	top: -13px;
 	right: 0;
 }
 .btngroup-btn{
-	    width: 3.5rem;
-	    height: 1.5rem;
-	    text-align: center;
-	    line-height: 1.5rem;
-	    font-size: 12px;
+	   width: 5.5rem;
+	   height: 2.5rem;
+	   text-align: center;
+	   line-height: 2.5rem;
+	   font-size: 12px;
 }
 
 .grace-shade{
@@ -386,22 +428,35 @@ export default {
 	line-height: 41px !important;
 }
 .skufooter{
-	position: fixed;
-	display: flex;justify-content: space-around;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: space-around;
+	justify-content: center;
 	text-align: center;
-	align-items: center;
-	border-top: 1px solid;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	align-items: self-start;
 	background: white !important;
-	 bottom: 2.2rem;
 	right: 0;
 	left: 0;
-	
-	
+	width: 60%;
+	align-self: center;
+	margin: auto;
+	margin-top: 2rem;
 }
 .skufooter .btn{
 		width: 80%;
 		flex: 1;
 		background: #white !important;
 	}
-
+.skufooter .btn{
+		width: 80%;
+		flex: 1;
+		background: #white !important;
+	}
+.grace-coupons .left{
+	height: 12rem !important;
+	border-bottom: 1px solid lightgray;
+}
 </style>
