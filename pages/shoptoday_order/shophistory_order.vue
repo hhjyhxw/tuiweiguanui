@@ -2,7 +2,7 @@
 	<gracePage :customHeader="false">
 		<view slot="gBody" class="grace-body"  >
 			<view class="SegmentedControlIn">
-				<graceSegmentedControl :items="tabs" :current="current" @change="onChange"></graceSegmentedControl>
+				<graceSegmentedControl :items="tabs" :current="tabCurrentIndex" @change="onChange"></graceSegmentedControl>
 			</view>
 			<graceEmptyNew>
 				<view slot="img" class="empty-view" v-show="!hasdata">
@@ -16,48 +16,37 @@
 				<view class="order" v-for="(item,index) in orderlist">
 					<view class="order-top-info">
 						<view class="order-user-info">
-							<image class="user-img" src="/static/yonghu.png"></image>
+							<image class="user-img" :src="item.user.headimgurl"></image>
 							<view class="user-text">
-								<view class="nickname">{{item.consignee}}</view>
+								<view class="nickname">{{item.user.nickname}}</view>
 								<!-- <view class="phone">15077144027</view> -->
 							</view>
 						</view>
 						<view class="order-pay-info">
 							<view class="money">￥{{item.actualPrice}}</view>
-							<view class="paystatus">已支付</view>
+							<view class="paystatus" v-if="item.payStatus==0 || item.payStatus==1" >未支付</view>
+							<view class="paystatus" v-if="item.payStatus==2" >已支付</view>
 						</view>
 					</view>
 					<view class="border-bottom-info">
-						<view class="orderno">1298437818426724352</view>
-						<view class="ordertime">2020-11-20 21:25:20</view>
-						<view class="seek-order" @click="showorHide">查看</view>
+						<view class="orderno">{{item.orderNo}}</view>
+						<view class="ordertime">{{item.createTime}}</view>
+						<view class="seek-order" @click="showorHide(item,index)">查看</view>
 					</view>
 					<!-- 订单详情列表 -->
-					<view  :class="['order-detail-list', show==true ? 'grace-accordion-show' : 'grace-accordion-hide']">
-						<image class="goods-img" src="../../static/jian.png"></image>
+					<view  :class="['order-detail-list', item.show==true ? 'grace-accordion-show' : 'grace-accordion-hide']" v-for="(item2,inex2) in item.detaillist">
+						<image class="goods-img" :src="item2.spuImg"></image>
 						<view class="goods-info">
-							<view class="goods-name">【蔬菜】约500g/份</view>
+							<view class="goods-name">{{item2.skuTitle}}</view>
 							<view class="price-amount">
-								<view class="price">￥2.5</view>
-								<view class="num">2份</view>
+								<view class="price">￥{{item2.price}}</view>
+								<view class="num">{{item2.num}}</view>
 							</view>
 						</view>
-						<view class="total-amount">￥5</view>
+						<view class="total-amount">￥{{item2.totalAmout}}</view>
 					</view>
 					<!-- 订单详情列表end -->
-					<!-- 订单详情列表 -->
-					<view  :class="['order-detail-list', show==true ? 'grace-accordion-show' : 'grace-accordion-hide']">
-						<image class="goods-img" src="../../static/jian.png"></image>
-						<view class="goods-info">
-							<view class="goods-name">【蔬菜】约500g/份</view>
-							<view class="price-amount">
-								<view class="price">￥2.5</view>
-								<view class="num">2份</view>
-							</view>
-						</view>
-						<view class="total-amount">￥5</view>
-					</view>
-					<!-- 订单详情列表end -->
+					
 				</view>
 					<!-- 订单信息end -->
 				
@@ -80,10 +69,11 @@ import { mapState } from 'vuex';
 					page: 1,//商品列表 页码
 					limit:10,
 					totalPage: 0,//商品列表总页数
+					payStatus:''
 				},
 				accordionActive: "grace-accordion-1",
-				current : 0,
-				tabs: ['全部','已支付','已完成','未支付'],
+				tabCurrentIndex : 0,
+				tabs: ['全部','已支付','未支付'],
 				show:false,
 			}
 			
@@ -102,18 +92,32 @@ import { mapState } from 'vuex';
 			init(){
 				
 			},
-			showorHide(){
-				if(this.show==true){
-					this.show=false;
+			onChange(index){
+				this.tabCurrentIndex = index;
+				if(index==0){
+					this.queryData.payStatus='';
+				}else if(index==1){
+					this.queryData.payStatus='2';
+				}else if(index==2){
+					this.queryData.payStatus='0';
+				}
+				this.orderlist=[];
+				this.queryData.page=0;
+				this.queryData.totalPage=0;
+				this.getOrderList(this.queryData)
+			},
+			showorHide(item,index){
+				if(item.show==true){
+					this.orderlist[index].show=false;
 				}else{
-					this.show=true;
+					this.orderlist[index].show=true;
 				}
 			},
 			
 			//获取店铺商品列表
 			async getOrderList (querData,first) {
 				console.log(JSON.stringify(querData));
-			    let result = await this.$api.request('shopkeeper/shopOrder', 'todayOrderlist',querData);
+			    let result = await this.$api.request('shopkeeper/shopOrder', 'hisOrderlist',querData);
 				console.log(JSON.stringify(result));
 			    if(result.code != 0 || result.page.list==null || result.page.list.length==0){
 			    	this.hasdata = false;//没有数据展示空页
