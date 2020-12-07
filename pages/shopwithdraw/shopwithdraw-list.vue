@@ -131,7 +131,7 @@
 			methods: {
 				async getDrawList (querData,first) {
 					console.log(JSON.stringify(querData));
-					let result = await this.$api.requestGet('shopkeeper/shopWithdraw', 'drawList',querData);
+					let result = await this.$api.request('shopkeeper/shopWithdraw', 'drawList',querData);
 					console.log(JSON.stringify(result));
 					if(result.code != 0 || result.page.list==null || result.page.list.length==0){
 						this.hasdata = false;//没有数据展示空页
