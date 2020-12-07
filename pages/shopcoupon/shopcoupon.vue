@@ -56,8 +56,7 @@
 									<text class="grace-form-label">使用限制</text>
 									<view class="grace-form-body" style="padding:20rpx 0;">
 										<radio-group name="danxuan" @change="surplusRadioChange">
-											<label class="grace-check-item-v"><radio :value="1" v-model="smallCoupon.surplus"></radio>新用户</label>
-											<label class="grace-check-item-v"><radio :value="0" v-model="smallCoupon.surplus"></radio>不限</label>
+											<label class="grace-check-item-v" v-for="(item, index) in surplusList" :key="item"><radio :value="item.value" :checked="index === surplusIndex"></radio>{{item.name}}</label>
 										</radio-group>
 									</view>
 								</view>
@@ -65,8 +64,7 @@
 									<text class="grace-form-label">优惠券类型</text>
 									<view class="grace-form-body" style="padding:20rpx 0;">
 										<radio-group name="danxuan" @change="coupTypeRadioChange">
-											<label class="grace-check-item-v"><radio value="1" v-model="smallCoupon.coupType"></radio>满减券</label>
-											<label class="grace-check-item-v"><radio value="0" v-model="smallCoupon.coupType"></radio>折扣券</label>
+											<label class="grace-check-item-v" v-for="(item, index) in coupTypeList" :key="item"><radio :value="item.value" :checked="index === coupTypeIndex"></radio>{{item.name}}</label>
 										</radio-group>
 									</view>
 								</view>
@@ -97,8 +95,8 @@
 								<view class="grace-form-item grace-border-b">
 									<text class="grace-form-label">使用分类</text>
 									<view class="grace-form-body">
-										<picker class="grace-form-picker" @change="bindPickerChange" :value="genderIndex" :range="gender" name="gender">
-											<text class="grace-text">{{gender[genderIndex]}}</text>
+										<picker class="grace-form-picker" @change="bindPickerChange" :value="categoryIndex" :range="categoryTitle">
+											<text class="grace-text">{{categoryTitle[categoryIndex]}}</text>
 											<text class="grace-icons icon-arrow-down" style="margin-left:5px;"></text>
 										</picker>
 									</view>
@@ -157,21 +155,21 @@ export default {
 			selectIndex2        : 1,
 			selectMenu2         : ['全部','开启','关闭'],
 			coupons: [
-				{
-					color : '#9F6DFA', ltBg : "#FFFFFF", height : '180rpx',
-					unit:"￥", number:5, txt:"满50元可用", title:"全场通用券", desc:"有效期至 2018-05-20",
-					btn : "领取", drawed : "已抢2100张" ,"isshowbtn":false
-				},
-				{
-					color : '#FF3456', ltBg : "#FFFFFF", height : '180rpx',
-					unit:"￥", number:10, txt:"满50元可用", title:"电器专场用券", desc:"有效期至 2018-05-28",
-					btn : "已领取", drawed : "已抢2800张" ,"isshowbtn":false
-				},
-				{
-					color : '#FF8830', ltBg : "#FFFFFF", height : '180rpx',
-					unit:"￥", number:100, txt:"满500元可用", title:"服饰专场用券", desc:"有效期至 2018-05-28",
-					btn : "领券","isshowbtn":false
-				}
+				// {
+				// 	color : '#9F6DFA', ltBg : "#FFFFFF", height : '180rpx',
+				// 	unit:"￥", number:5, txt:"满50元可用", title:"全场通用券", desc:"有效期至 2018-05-20",
+				// 	btn : "领取", drawed : "已抢2100张" ,"isshowbtn":false
+				// },
+				// {
+				// 	color : '#FF3456', ltBg : "#FFFFFF", height : '180rpx',
+				// 	unit:"￥", number:10, txt:"满50元可用", title:"电器专场用券", desc:"有效期至 2018-05-28",
+				// 	btn : "已领取", drawed : "已抢2800张" ,"isshowbtn":false
+				// },
+				// {
+				// 	color : '#FF8830', ltBg : "#FFFFFF", height : '180rpx',
+				// 	unit:"￥", number:100, txt:"满500元可用", title:"服饰专场用券", desc:"有效期至 2018-05-28",
+				// 	btn : "领券","isshowbtn":false
+				// }
 			],
 			
 			/* 移动所需参数 */
@@ -181,8 +179,16 @@ export default {
 			endY: 0,
 			status: false,
 			isshowbtn:false,
-			gender : ['选择使用对象', '男', '女'],
-			genderIndex : 0,
+			
+			categoryIndex:0,//用于选择分类
+			categoryTitle:[],//用于选择分类
+			categoryList:[],//用于选择分类
+			
+			coupTypeList:[{value:0,name:'折扣卷'},{value:1,name:'满减卷'}],//0折扣卷 1 满减卷
+			coupTypeIndex:0,
+			
+			surplusList:[{value:0,name:'不限用户'},{value:1,name:'新用户'}],//不限用户 1新用户
+			surplusIndex:0,
 			
 			smallCoupon:{
 				title:'',
@@ -214,6 +220,7 @@ export default {
 	},
 	onShow() {
 		this.getCouponList(this.queryData);	
+		this.getCategoryList();//商品分类列表
 	},
 	components:{
 		gracePage, graceSelectMenu,graceCoupons,graceShade,graceDateTime
@@ -236,9 +243,32 @@ export default {
 				// }
 			});
 		},
+		//获取店铺分类列表信息
+		getCategoryList(){
+			var that = this;
+			that.$api.requestGet('shopkeeper/shopCategory', 'getGategoryList',null,failres => {
+				that.$api.msg(failres.msg)
+			}).then(res => {
+				if (res.list!=null && res.list.length>0) {
+					that.categoryList = res.list;
+					var newData = [];
+					newData.push('选择分类')
+					// 遍历数据 转换对象格式
+					res.list.forEach((item)=>{
+						newData.push(item.title);
+					})
+					that.categoryTitle = newData;
+				}else{
+					that.categoryTitle = [];
+				}
+			});
+		},
 		//保存优惠卷
 		save(){
 			var that = this;
+			if(that.categoryList!=null && that.categoryList.length>0 && that.categoryIndex>0){
+				that.smallCoupon.categoryId = that.categoryList[that.categoryIndex].id;
+			}
 			that.$api.request('shopkeeper/shopCoupon','saveCoupon',that.smallCoupon,failres => {
 				that.$api.msg(failres.msg)
 			}).then(res => {
@@ -250,11 +280,10 @@ export default {
 		},
 		//
 		surplusRadioChange(e){
-			// var surplus_val = e.target.value
-			console.log("surplus_val======"+JSON.stringify(e))
+			this.smallCoupon.surplus=e.target.value;
 		},
 		coupTypeRadioChange(e){
-			var coupType_val = e.target.value
+			this.smallCoupon.coupType=e.target.value;
 		},
 		goback : function () { uni.navigateBack({}); },
 		showMenu1  : function () {this.show1 = true;},
@@ -400,6 +429,20 @@ export default {
 				}).then(res => {
 					console.log("res=="+JSON.stringify(res))
 					that.smallCoupon = res.smallCoupon;
+					//编辑商品的时候设置 商品分类名称
+					if(that.categoryList!=null && that.categoryList.length>0){
+						for (var i = 0; i < that.categoryList.length; i++) {
+							if(that.categoryList[i].id==that.smallCoupon.categoryId){
+								that.categoryIndex = i;
+							}
+						}
+					}
+					if(that.smallCoupon.surplus===1){
+						that.surplusIndex=1;
+					}
+					if(that.smallCoupon.coupType===1){
+						that.coupTypeIndex=1;
+					}
 					this.showShade();
 				});
 			},
@@ -428,6 +471,10 @@ export default {
 				}).then(res => {
 					that.coupons.splice(index,1);
 				});
+			},
+			//编辑商品 选择分类
+			 bindPickerChange: function(e) {
+				this.categoryIndex = e.target.value;
 			},
 			/* 弹窗相关start */
 			showShade : function () {

@@ -237,6 +237,7 @@ export default {
 					var newData1 = [];
 					// 遍历数据 转换对象格式
 					newData.push('全部');
+					newData1.push('选择分类')
 					res.list.forEach((item)=>{
 						newData.push(item.title);
 						newData1.push(item.title);
@@ -244,7 +245,6 @@ export default {
 					// 转换后将数据赋值到组件
 					that.selectMenu3 = newData;
 					that.categoryTitle = newData1;
-					that.categoryTitle.splice(0,1);
 					
 				}else{
 					that.selectMenu3=[];
@@ -400,9 +400,7 @@ export default {
 		},
 		//编辑商品 选择分类
 		 bindPickerChange: function(e) {
-			//console.log('picker发送选择改变，携带值为', JSON.stringify(e.target.value))
 			this.categoryIndex = e.target.value;
-			//this.spu.categoryId = this.categoryTitle[this.categoryIndex].id;
 		},
 		//添加商品sku
 		addSkuItem(){
@@ -457,8 +455,10 @@ export default {
 			that.spu.price = that.skulist[0].price;
 			that.spu.originalPrice = that.skulist[0].originalPrice;
 			that.spu.skulist = that.skulist;
-			that.spu.categoryId = that.categoryList[that.categoryIndex].id;
-			console.log("spu==="+JSON.stringify(that.spu));
+			var that = this;
+			if(that.categoryList!=null && that.categoryList.length>0 && that.categoryIndex>0){
+				that.spu.categoryId = that.categoryList[that.categoryIndex].id;
+			}
 			that.$api.request('shopkeeper/shopgoods', 'saveSpu',that.spu,failres => {
 				that.$api.msg(failres.msg)
 			}).then(res => {
