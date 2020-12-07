@@ -100,6 +100,15 @@
 							</view>
 							<text class="grace-list-arrow-right grace-icons icon-arrow-right"></text>
 						</view>
+						<view class="grace-list-items" @click="navigo('/pages/shopbankcard/shopbankcardlist')">
+							<text class="grace-list-icon grace-icons icon-article grace-blue-sky"></text>
+							<view class="grace-list-body grace-border-b">
+								<view class="grace-list-title">
+									<text class="grace-list-title-text">银行卡</text>
+								</view>
+							</view>
+							<text class="grace-list-arrow-right grace-icons icon-arrow-right"></text>
+						</view>
 				</view>
 			</view>
 </gracePage>
