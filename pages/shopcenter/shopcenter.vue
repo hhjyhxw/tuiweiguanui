@@ -34,7 +34,7 @@
 				<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
 				<graceShade @closeShade="closeShade" ref="graceShade">
 					<view class="demo-msg grace-relative" @tap.stop="">
-						<view  style="padding:20rpx 0;background-color: white;border-radius: 10px;">
+						<view  style="padding:20rpx 0;background-color: white;border-radius: 10px;height: 8rem;">
 							<textarea class="grace-textarea" v-model="selfaddress" placeholder="提货地址" >{{selfaddress}}</textarea>
 						</view>
 							<view class="addresssave">
@@ -169,8 +169,7 @@
 </template>
 <script>
 import gracePage from "../../graceUI/components/gracePage.vue";
-// import graceBoxBanner from "../../graceUI/components/graceBoxBanner.vue";
-import graceShade from "../../graceUI/components/graceShade.vue";
+import graceShade from "../../graceUI/components/graceShadeShopcenter.vue";
 	import {
 	    mapState 
 	} from 'vuex'; 
@@ -526,7 +525,15 @@ import graceShade from "../../graceUI/components/graceShade.vue";
 .ucenter-face-image{width:100rpx !important; height:100rpx !important;}
 .ucenter-line{height:12rpx; background-color:#F4F5F6; margin:16rpx 0;}
 
-.demo-msg{width:500rpx; font-size:0;}
+.demo-msg{padding:3px;
+		background-color: white;
+		/* margin-top: 45px; */
+		border-radius: 5px;
+		padding-bottom: 10px;
+		height: 100%;width:19rem; font-size:0;}
 .demo-msg-in{width:500rpx; height:800rpx;}
 .close-btn{width:80rpx; height:80rpx; line-height:80rpx; text-align:center; font-size:40rpx; z-index:7;}
+.grace-relative{
+		height: 100% !important;
+	}
 </style>

@@ -89,9 +89,7 @@ import { mapState } from 'vuex';
 			...mapState(['hasLogin','userInfo'])
 		},
 		methods: {
-			init(){
-				
-			},
+			
 			onChange(index){
 				this.tabCurrentIndex = index;
 				if(index==0){

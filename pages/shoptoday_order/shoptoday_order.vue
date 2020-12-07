@@ -2,7 +2,7 @@
 	<gracePage :customHeader="false">
 		<view slot="gBody" class="grace-body"  >
 			<view class="SegmentedControlIn">
-				<graceSegmentedControl :items="tabs" :current="current" @change="onChange"></graceSegmentedControl>
+				<graceSegmentedControl :items="tabs" :current="tabCurrentIndex" @change="onChange"></graceSegmentedControl>
 			</view>
 			<graceEmptyNew>
 				<view slot="img" class="empty-view" v-show="!hasdata">
@@ -13,51 +13,40 @@
 			</graceEmptyNew>
 			<view class="order-list" v-show="hasdata">
 				<!-- 订单信息start -->
-				<view class="order">
+				<view class="order" v-for="(item,index) in orderlist">
 					<view class="order-top-info">
 						<view class="order-user-info">
-							<image class="user-img" src="/static/yonghu.png"></image>
+							<image class="user-img" :src="item.user.headimgurl"></image>
 							<view class="user-text">
-								<view class="nickname">阿木木</view>
-								<view class="phone">15077144027</view>
+								<view class="nickname">{{item.user.nickname}}</view>
+								<!-- <view class="phone">15077144027</view> -->
 							</view>
 						</view>
 						<view class="order-pay-info">
-							<view class="money">￥200</view>
-							<view class="paystatus">已支付</view>
+							<view class="money">￥{{item.actualPrice}}</view>
+							<view class="paystatus" v-if="item.payStatus==0 || item.payStatus==1" >未支付</view>
+							<view class="paystatus" v-if="item.payStatus==2" >已支付</view>
 						</view>
 					</view>
 					<view class="border-bottom-info">
-						<view class="orderno">1298437818426724352</view>
-						<view class="ordertime">2020-11-20 21:25:20</view>
-						<view class="seek-order" @click="showorHide">查看</view>
+						<view class="orderno">{{item.orderNo}}</view>
+						<view class="ordertime">{{item.createTime}}</view>
+						<view class="seek-order" @click="showorHide(item,index)">查看</view>
 					</view>
 					<!-- 订单详情列表 -->
-					<view  :class="['order-detail-list', show==true ? 'grace-accordion-show' : 'grace-accordion-hide']">
-						<image class="goods-img" src="../../static/jian.png"></image>
+					<view  :class="['order-detail-list', item.show==true ? 'grace-accordion-show' : 'grace-accordion-hide']" v-for="(item2,inex2) in item.detaillist">
+						<image class="goods-img" :src="item2.spuImg"></image>
 						<view class="goods-info">
-							<view class="goods-name">【蔬菜】约500g/份</view>
+							<view class="goods-name">{{item2.skuTitle}}</view>
 							<view class="price-amount">
-								<view class="price">￥2.5</view>
-								<view class="num">2份</view>
+								<view class="price">￥{{item2.price}}</view>
+								<view class="num">{{item2.num}}</view>
 							</view>
 						</view>
-						<view class="total-amount">￥5</view>
+						<view class="total-amount">￥{{item2.totalAmout}}</view>
 					</view>
 					<!-- 订单详情列表end -->
-					<!-- 订单详情列表 -->
-					<view  :class="['order-detail-list', show==true ? 'grace-accordion-show' : 'grace-accordion-hide']">
-						<image class="goods-img" src="../../static/jian.png"></image>
-						<view class="goods-info">
-							<view class="goods-name">【蔬菜】约500g/份</view>
-							<view class="price-amount">
-								<view class="price">￥2.5</view>
-								<view class="num">2份</view>
-							</view>
-						</view>
-						<view class="total-amount">￥5</view>
-					</view>
-					<!-- 订单详情列表end -->
+					
 				</view>
 					<!-- 订单信息end -->
 				
@@ -75,85 +64,58 @@ import { mapState } from 'vuex';
 		data() {
 			return {
 				hasdata:true,
-				shopId:null,
 				orderlist:[],
 				queryData:{
-					shopId:null,
-					pageNum: 1,//商品列表 页码
-					pageSize:5,
+					page: 1,//商品列表 页码
+					limit:10,
 					totalPage: 0,//商品列表总页数
+					payStatus:''
 				},
-				totalAmount:0,//总下单金额
 				accordionActive: "grace-accordion-1",
-				
-				current : 0,
-				tabs: ['全部','已支付','已完成','未支付'],
+				tabCurrentIndex : 0,
+				tabs: ['全部','已支付','未支付'],
 				show:false,
 			}
 			
 		},
 		onShow(){
-			if(this.queryData.shopId==null || typeof(this.queryData.shopId) == "undefined"){
-				try {
-				    const value = uni.getStorageSync('shopMainId');
-				    if (value) {
-				        console.log("value======"+value);
-						//this.queryData.shopId = value;
-				    }
-				} catch (e) {
-				    // error
-				}
-			}
-			this.init();
+			
+			this.getOrderList(this.queryData);
 		},
 		onLoad(option){
-			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-			if(option.shopId!=null && typeof(option.shopId) != "undefined"){
-				this.shopId = option.shopId;
-				this.queryData.shopId = option.shopId;
-			}
+			
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo'])
 		},
 		methods: {
-			init(){
-				
+			
+			onChange(index){
+				this.tabCurrentIndex = index;
+				if(index==0){
+					this.queryData.payStatus='';
+				}else if(index==1){
+					this.queryData.payStatus='2';
+				}else if(index==2){
+					this.queryData.payStatus='0';
+				}
+				this.orderlist=[];
+				this.queryData.page=0;
+				this.queryData.totalPage=0;
+				this.getOrderList(this.queryData)
 			},
-			// showorHide(item0,index0){
-			// 	if(item0.show==true){
-			// 		// item0.show = false;
-			// 		this.orderlist[index0].show=false;
-			// 	}else{
-			// 		// item.show = true;
-			// 		this.orderlist[index0].show=true;
-			// 	}
-			// },
-			showorHide(){
-				if(this.show==true){
-					this.show=false;
+			showorHide(item,index){
+				if(item.show==true){
+					this.orderlist[index].show=false;
 				}else{
-					this.show=true;
+					this.orderlist[index].show=true;
 				}
 			},
-			getTotalAmount(){
-				const that = this
-				let param ={
-					'shopId':that.shopId
-				};
-				that.$api.requestGet('order', 'getTotalOrderAmount',param,failres => {
-					that.$api.msg(failres.msg)
-				}).then(res => {
-					if(res.code==0){
-					console.log('res===='+JSON.stringify(res)); //打印出上个页面传递的参数。
-						that.totalAmount = res.totalAmount;
-					}
-				});
-			},
+			
 			//获取店铺商品列表
 			async getOrderList (querData,first) {
 				console.log(JSON.stringify(querData));
-			    let result = await this.$api.requestGet('order', 'orderlist',querData);
+			    let result = await this.$api.request('shopkeeper/shopOrder', 'todayOrderlist',querData);
 				console.log(JSON.stringify(result));
 			    if(result.code != 0 || result.page.list==null || result.page.list.length==0){
 			    	this.hasdata = false;//没有数据展示空页
@@ -170,19 +132,17 @@ import { mapState } from 'vuex';
 		},
 		
 		onPullDownRefresh() {
-			 this.queryData.pageNum = 1;
+			 this.queryData.page = 1;
 			 this.queryData.totalPage = 0;
 			 this.getOrderList(this.queryData,true);
 			   uni.stopPullDownRefresh();
 		 },
 		 onReachBottom(){//页面滚动到底部的事件
-		 	if (this.queryData.pageNo > this.queryData.totalPage) {
+		 	if (this.queryData.page > this.queryData.totalPage) {
 		 		return false;
 		 	}
-		     this.queryData.pageNum = this.queryData.pageNum + 1;
-		 	 console.log("pageNum==="+this.queryData.pageNum);
-		 	  console.log("totalPage==="+this.queryData.totalPage);
-		     if (this.queryData.pageNum > this.queryData.totalPage) {
+		     this.queryData.page = this.queryData.page + 1;
+		     if (this.queryData.page > this.queryData.totalPage) {
 		         return false;
 		     }
 		     this.getOrderList(this.queryData,false);
