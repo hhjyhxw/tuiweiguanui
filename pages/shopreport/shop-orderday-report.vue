@@ -65,8 +65,8 @@ import { mapState } from 'vuex';
 				let result = await this.$api.request('shopkeeper/shopStatistic', 'orderMonthList',querData);
 				console.log(JSON.stringify(result));
 				if(result.code == 0){
-					this.queryData.datetime=result.datetime;
-					this.queryData.formatdatetime=result.formatdatetime;
+					this.queryData.datetime=result.shopOrderDayreportdto.datetime;
+					this.queryData.formatdatetime=result.shopOrderDayreportdto.formatdatetime;
 				}
 				if(result.code != 0 || result.page.list==null || result.page.list.length==0){
 					this.hasdata = false;//没有数据展示空页

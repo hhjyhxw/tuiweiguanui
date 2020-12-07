@@ -13,17 +13,17 @@
 			</graceEmptyNew>
 			<view class="order-list" v-show="hasdata">
 				<!-- 订单信息start -->
-				<view class="order">
+				<view class="order" v-for="(item,index) in orderlist">
 					<view class="order-top-info">
 						<view class="order-user-info">
 							<image class="user-img" src="/static/yonghu.png"></image>
 							<view class="user-text">
-								<view class="nickname">阿木木</view>
-								<view class="phone">15077144027</view>
+								<view class="nickname">{{item.consignee}}</view>
+								<!-- <view class="phone">15077144027</view> -->
 							</view>
 						</view>
 						<view class="order-pay-info">
-							<view class="money">￥200</view>
+							<view class="money">￥{{item.actualPrice}}</view>
 							<view class="paystatus">已支付</view>
 						</view>
 					</view>
@@ -75,17 +75,13 @@ import { mapState } from 'vuex';
 		data() {
 			return {
 				hasdata:true,
-				shopId:null,
 				orderlist:[],
 				queryData:{
-					shopId:null,
-					pageNum: 1,//商品列表 页码
-					pageSize:5,
+					page: 1,//商品列表 页码
+					limit:10,
 					totalPage: 0,//商品列表总页数
 				},
-				totalAmount:0,//总下单金额
 				accordionActive: "grace-accordion-1",
-				
 				current : 0,
 				tabs: ['全部','已支付','已完成','未支付'],
 				show:false,
@@ -93,25 +89,11 @@ import { mapState } from 'vuex';
 			
 		},
 		onShow(){
-			if(this.queryData.shopId==null || typeof(this.queryData.shopId) == "undefined"){
-				try {
-				    const value = uni.getStorageSync('shopMainId');
-				    if (value) {
-				        console.log("value======"+value);
-						//this.queryData.shopId = value;
-				    }
-				} catch (e) {
-				    // error
-				}
-			}
-			this.init();
+			
+			this.getOrderList(this.queryData);
 		},
 		onLoad(option){
-			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-			if(option.shopId!=null && typeof(option.shopId) != "undefined"){
-				this.shopId = option.shopId;
-				this.queryData.shopId = option.shopId;
-			}
+			
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo'])
@@ -120,15 +102,6 @@ import { mapState } from 'vuex';
 			init(){
 				
 			},
-			// showorHide(item0,index0){
-			// 	if(item0.show==true){
-			// 		// item0.show = false;
-			// 		this.orderlist[index0].show=false;
-			// 	}else{
-			// 		// item.show = true;
-			// 		this.orderlist[index0].show=true;
-			// 	}
-			// },
 			showorHide(){
 				if(this.show==true){
 					this.show=false;
@@ -136,24 +109,11 @@ import { mapState } from 'vuex';
 					this.show=true;
 				}
 			},
-			getTotalAmount(){
-				const that = this
-				let param ={
-					'shopId':that.shopId
-				};
-				that.$api.requestGet('order', 'getTotalOrderAmount',param,failres => {
-					that.$api.msg(failres.msg)
-				}).then(res => {
-					if(res.code==0){
-					console.log('res===='+JSON.stringify(res)); //打印出上个页面传递的参数。
-						that.totalAmount = res.totalAmount;
-					}
-				});
-			},
+			
 			//获取店铺商品列表
 			async getOrderList (querData,first) {
 				console.log(JSON.stringify(querData));
-			    let result = await this.$api.requestGet('order', 'orderlist',querData);
+			    let result = await this.$api.request('shopkeeper/shopOrder', 'todayOrderlist',querData);
 				console.log(JSON.stringify(result));
 			    if(result.code != 0 || result.page.list==null || result.page.list.length==0){
 			    	this.hasdata = false;//没有数据展示空页
@@ -170,19 +130,17 @@ import { mapState } from 'vuex';
 		},
 		
 		onPullDownRefresh() {
-			 this.queryData.pageNum = 1;
+			 this.queryData.page = 1;
 			 this.queryData.totalPage = 0;
 			 this.getOrderList(this.queryData,true);
 			   uni.stopPullDownRefresh();
 		 },
 		 onReachBottom(){//页面滚动到底部的事件
-		 	if (this.queryData.pageNo > this.queryData.totalPage) {
+		 	if (this.queryData.page > this.queryData.totalPage) {
 		 		return false;
 		 	}
-		     this.queryData.pageNum = this.queryData.pageNum + 1;
-		 	 console.log("pageNum==="+this.queryData.pageNum);
-		 	  console.log("totalPage==="+this.queryData.totalPage);
-		     if (this.queryData.pageNum > this.queryData.totalPage) {
+		     this.queryData.page = this.queryData.page + 1;
+		     if (this.queryData.page > this.queryData.totalPage) {
 		         return false;
 		     }
 		     this.getOrderList(this.queryData,false);

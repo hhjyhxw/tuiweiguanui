@@ -15,7 +15,7 @@
 				<view class="list-item">
 					<view class="ls-row-list">
 						<view class="label-text ls-cl-blue">{{item.bizType}}</view>
-						<view class="money">{{item.inOrOut}}{{item.amount}}</view>
+						<view class="money" :style="{color:item.color}">{{item.inOrOut}}{{item.amount}}</view>
 					</view>
 					<view class="ls-row-list">
 						<view class="label-text">余额</view>
@@ -208,9 +208,11 @@
 	.ls-form{
 		padding:3px;
 		background-color: white;
-		margin-top: 45px;
+		/* margin-top: 45px; */
 		border-radius: 5px;
 		padding-bottom: 10px;
+		height: 100%;
+		
 	}
 	.ls-form-item{
 		display: flex;
@@ -237,15 +239,24 @@
 	}
 	.ls-btn-box{
 		margin-top: 5rem;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
 	}
 	.ls-btn{
+		width: 100%;
 		font-size:30rpx; line-height:88rpx; padding:0; border-radius:6rpx;
 		background:linear-gradient(to right, #00FFD5 ,#008CFF) !important; color:#FFFFFF !important;
+	
 	}
 	.ls-btn::after{border-radius:5rpx !important; border:none;}
 	
 	.grace-shade-in {
 	    width: 100% !important;
 	    height: 100% !important;
+	}
+	.grace-relative{
+		height: 100% !important;
 	}
 </style>

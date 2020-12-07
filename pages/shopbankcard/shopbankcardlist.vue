@@ -2,8 +2,11 @@
 	<gracePage :customHeader="false">
 		<!-- 页面主体 -->
 		<view class="grace-body" slot="gBody">
-			<view class="grace-list">
-				<view class="grace-list-items" v-for="(item,index) in bankCardList" @click="toedit(item)">
+			<view class="graceSelectMenuItem">
+					<button type="default" class="grace-button grace-bg-light-blue" size="mini"  @click="showShade">添加</button>
+			</view>
+			<view class="grace-list" v-for="(item,index) in bankCardList" @click="toedit(item)">
+				<view class="grace-list-items" >
 					<view class="grace-list-body grace-border-b">
 						<view class="grace-list-title">
 							<text class="grace-list-title-text">{{item.bankName}}</text>
@@ -13,70 +16,74 @@
 					<text class="grace-list-arrow-right grace-icons icon-arrow-right"></text>
 				</view>
 			</view>
+			
+			
+			<!-- 明细弹窗 start-->
+			<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
+			<graceShade @closeShade="closeShade" ref="graceShade">
+				<view class="addgoods-box grace-relative" @tap.stop="">
+					<!-- 表单 -->
+					<view class="ls-form">
+						<view class="ls-form-item">
+							<view class="ls-form-label">银行名称</view>
+							<view class="ls-form-input-box">
+								<!-- <input class="ls-form-input" value="" placeholder="请输入支行名称"/> -->
+								<picker @change="bindPickerChange" :value="bankIndex" :range="bankList">
+									<view class="ls-form-input-box">{{bankList[bankIndex]}}</view>
+								</picker>
+							</view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">支行名称</view>
+							<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.subBranch" placeholder="请输入支行名称"/></view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">用户名称</view>
+							<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.userName" placeholder="请输入用户名称"/></view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">手机号</view>
+							<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.mobile" placeholder="请输入手机号"/></view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">卡号</view>
+							<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.cardNo" placeholder="请输入卡号"/></view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">开户行编号</view>
+							<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.bankCode" placeholder="请输入卡号"/></view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">卡号状态</view>
+							<view class="ls-form-input-box"><text>{{statusMsg}}</text></view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">审核状态</view>
+							<view class="ls-form-input-box"><text>{{approveFlagMsg}}</text></view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">审核结果</view>
+							<view class="ls-form-input-box"><text>{{shopBank.msg!=null?shopBank.msg:''}}</text></view>
+						</view>
+						<view class="ls-btn-box">
+							<button class="ls-btn ls-btn-blue" @tap.stop="closeShade">关闭</button><button class="ls-btn ls-btn-blue" @click="save()">保存</button>
+						</view>
+						
+					</view>
+					<!-- 表单数据end -->
+					<view class="close-btn grace-icons icon-close3 grace-white grace-absolute-rt" @tap.stop="closeShade"></view>
+				</view>
+			</graceShade>
+			<!--  明细弹窗end-->
 		</view>
 		
-		<!-- 明细弹窗 start-->
-		<!-- 遮罩组件 @closeShade="closeShade" 实现点击关闭自身，如果不需要次功能则不绑定此事件即可 -->
-		<graceShade @closeShade="closeShade" ref="graceShade">
-			<view class="demo-msg grace-relative" @tap.stop="">
-				<!-- 表单 -->
-				<view class="ls-form">
-					<view class="ls-form-item">
-						<view class="ls-form-label">银行名称</view>
-						<view class="ls-form-input-box">
-							<!-- <input class="ls-form-input" value="" placeholder="请输入支行名称"/> -->
-							<picker @change="bindPickerChange" :value="bankIndex" :range="bankList">
-								<view class="ls-form-input-box">{{bankList[bankIndex]}}</view>
-							</picker>
-						</view>
-					</view>
-					<view class="ls-form-item">
-						<view class="ls-form-label">支行名称</view>
-						<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.bankName" placeholder="请输入支行名称"/></view>
-					</view>
-					<view class="ls-form-item">
-						<view class="ls-form-label">用户名称</view>
-						<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.userName" placeholder="请输入用户名称"/></view>
-					</view>
-					<view class="ls-form-item">
-						<view class="ls-form-label">手机号</view>
-						<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.mobile" placeholder="请输入手机号"/></view>
-					</view>
-					<view class="ls-form-item">
-						<view class="ls-form-label">卡号</view>
-						<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.cardNo" placeholder="请输入卡号"/></view>
-					</view>
-					<view class="ls-form-item">
-						<view class="ls-form-label">开户行编号</view>
-						<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopBank.bankCode" placeholder="请输入卡号"/></view>
-					</view>
-					<view class="ls-form-item">
-						<view class="ls-form-label">卡号状态</view>
-						<view class="ls-form-input-box"><text>{{statusMsg}}</text></view>
-					</view>
-					<view class="ls-form-item">
-						<view class="ls-form-label">审核状态</view>
-						<view class="ls-form-input-box"><text>{{approveFlagMsg}}</text></view>
-					</view>
-					<view class="ls-form-item">
-						<view class="ls-form-label">审核结果</view>
-						<view class="ls-form-input-box"><text>{{shopBank.msg}}</text></view>
-					</view>
-					<view class="ls-btn-box">
-						<button class="ls-btn ls-btn-blue">保存</button>
-					</view>
-					
-				</view>
-				<!-- 表单数据end -->
-				<view class="close-btn grace-icons icon-close3 grace-white grace-absolute-rt" @tap.stop="closeShade"></view>
-			</view>
-		</graceShade>
-		<!--  明细弹窗end-->
+		
 	</gracePage>
 </template>
 <script>
 import gracePage from "../../graceUI/components/gracePage.vue";
 import graceFlex from "../../graceUI/components/graceFlex.vue";
+import graceShade from "../../graceUI/components/graceShade.vue";
 export default {
 	data() {
 		return {
@@ -146,12 +153,14 @@ export default {
 			else that.approveFlagMsg='未审核';
 			
 			if(that.bankList!=null && that.bankList.length>0){
-				for (var i = 0; i < that.bankList.length; i++) {
-					if(that.bankList[i].bankName==that.shopBank.bankName){
+				var i =0 ;
+				for (i = 0; i < that.bankList.length; i++) {
+					if(that.bankList[i]===that.shopBank.bankName){
 						that.bankIndex = i;
 					}
 				}
 			}
+			this.showShade();
 		},
 		//编辑 选择银行卡
 		 bindPickerChange: function(e) {
@@ -167,11 +176,11 @@ export default {
 		
 		save(){
 			var that = this;
-			if(that.bankIndex==0){
-				that.$api.msg('请选择银行');
-				return;
-			}
-			that.shopBank.bankName = that.bankList[that.bankName].id;
+			// if(that.bankIndex==0){
+			// 	that.$api.msg('请选择银行');
+			// 	return;
+			// }
+			that.shopBank.bankName = that.bankList[that.bankIndex];
 			that.$api.request('shopkeeper/shopBank','saveBank',that.shopBank,failres => {
 				that.$api.msg(failres.msg)
 			}).then(res => {
@@ -198,7 +207,7 @@ export default {
 		
 	},
 	components:{
-		gracePage, graceFlex
+		gracePage, graceFlex,graceShade
 	}
 }
 </script>
@@ -208,8 +217,22 @@ export default {
 		background-color: #F2F2F2;
 		
 	}
+	.grace-list-body-desc{
+		font-size: 19px !important;
+		color: black !important;
+		line-height: 36rpx;
+	}
+	.grace-shade{
+		background: rgba(0, 0, 0, 0.5) !important;
+		z-index: 5 !important;
+	}
+	.addgoods-box{
+	    background: white !important;
+		width: 25.8rem;
+		height: 43.2rem;
+	}
 .ls-form{
-	padding:3px;
+	padding:32px;
 	background-color: white;
 	margin-top: 10px;
 	border-radius: 5px;
@@ -232,10 +255,13 @@ export default {
 }
 .ls-btn-box{
 	margin-top: 5rem;
+	display: flex;
+	justify-content: space-around;
 }
 .ls-btn{
-	font-size:30rpx; line-height:88rpx; padding:0; border-radius:6rpx;
+	font-size:30rpx; line-height:86rpx; padding:0; border-radius:6rpx;height: 86rpx;
 	background:linear-gradient(to right, #00FFD5 ,#008CFF) !important; color:#FFFFFF !important;
+	width: 9rem;
 }
 .ls-btn::after{border-radius:5rpx !important; border:none;}
 

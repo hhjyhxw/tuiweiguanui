@@ -11,8 +11,8 @@
 		</view>
 		<view slot="gBody" class="grace-body"  v-show="hasdata">
 			<!-- 提现记录列表start -->
-			<view class="ls-column-list" v-show="showlist" v-for="(item,index) in cashlist">
-				<view class="list-item">
+			<view class="ls-column-list" v-show="showlist" >
+				<view class="list-item" v-for="(item,index) in drawList">
 					<view class="ls-row-list">
 						<view class="label-text">结算金额</view>
 						<view class="money">￥{{item.totalAmout}}</view>
@@ -26,11 +26,10 @@
 						<view class="money">￥{{item.handlingFee}}</view>
 					</view>
 					<view class="ls-row-list">
-						<view class="time">{{item.approveTime}}</view>
-						<view class="senk-btn">查看</view>
+						<view class="time">{{item.approveTime!=null?item.approveTime:''}}</view>
+						<view class="senk-btn" @click="seeDetail(item)">查看</view>
 					</view>
 				</view>
-				
 			</view>
 			<!-- 提现记录列表end -->
 			
@@ -46,7 +45,7 @@
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">银行流水号</view>
-							<view class="ls-form-input-box">{{drawData.transactionId}}</view>
+							<view class="ls-form-input-box">{{drawData.transactionId!=null?drawData.transactionId:''}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">结算金额</view>
@@ -74,15 +73,15 @@
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">手机号</view>
-							<view class="ls-form-input-box">15025685878</view>
+							<view class="ls-form-input-box">{{drawData.mobile}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">交易时间</view>
-							<view class="ls-form-input-box">2020/11/20 15:35:56</view>
+							<view class="ls-form-input-box">{{drawData.approveTime!=null?drawData.approveTime:''}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">交易状态</view>
-							<view class="ls-form-input-box ls-cl-purple">交易完成</view>
+							<view class="ls-form-input-box ls-cl-purple">{{drawData.approveFlag}}</view>
 						</view>
 						<view class="ls-btn-box">
 							<button class="ls-btn ls-btn-blue" @tap.stop="closeShade">关闭</button>
@@ -217,9 +216,10 @@
 	.ls-form{
 		padding:3px;
 		background-color: white;
-		margin-top: 45px;
+		/* margin-top: 45px; */
 		border-radius: 5px;
 		padding-bottom: 10px;
+		height: 100%;
 	}
 	.ls-form-item{
 		display: flex;
@@ -243,8 +243,13 @@
 	}
 	.ls-btn-box{
 		margin-top: 5rem;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
 	}
 	.ls-btn{
+		width: 100%;
 		font-size:30rpx; line-height:88rpx; padding:0; border-radius:6rpx;
 		background:linear-gradient(to right, #00FFD5 ,#008CFF) !important; color:#FFFFFF !important;
 	}
@@ -253,5 +258,8 @@
 	.grace-shade-in {
 	    width: 100% !important;
 	    height: 100% !important;
+	}
+	.grace-relative{
+		height: 100% !important;
 	}
 </style>
