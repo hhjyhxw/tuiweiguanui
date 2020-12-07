@@ -1,34 +1,29 @@
 <template>
 	<gracePage :customHeader="false">
-		<view slot="gBody" class="grace-body"  >
-			<!-- 交易明细（资金流水明细）start -->
-			<view class="ls-column-list" v-show="showlist">
-				<view class="list-item">
-					<view class="ls-row-list">
-						<view class="label-text ls-cl-blue">余额提现</view>
-						<view class="money">-200.00</view>
-					</view>
-					<view class="ls-row-list">
-						<view class="label-text">余额</view>
-						<view class="money minus">￥197.00</view>
-					</view>
-					<view class="ls-row-list">
-						<view class="time">2020/11/20 16:50:00</view>
-						<view class="senk-btn">查看</view>
-					</view>
+		<view slot="gBody" class="grace-body" v-show="!hasdata">
+			<graceEmptyNew>
+				<view slot="img" class="empty-view">
+					<!-- 请根据您的项目要求制作并更换为空图片 -->
+					<image class="empty-img" mode="widthFix" src="https://staticimgs.oss-cn-beijing.aliyuncs.com/empty.png"></image>
 				</view>
+				<text slot="text" class="grace-text-small grace-gray">抱歉，暂时没有数据</text>
+			</graceEmptyNew>
+		</view>
+		<view slot="gBody" class="grace-body"  v-show="hasdata">
+			<!-- 交易明细（资金流水明细）start -->
+			<view class="ls-column-list" v-show="showlist" v-for="(item,index) in cashlist">
 				<view class="list-item">
 					<view class="ls-row-list">
-						<view class="label-text ls-cl-red">订单收入</view>
-						<view class="money adds">200.00</view>
+						<view class="label-text ls-cl-blue">{{item.bizType}}</view>
+						<view class="money">{{item.inOrOut}}{{item.amount}}</view>
 					</view>
 					<view class="ls-row-list">
 						<view class="label-text">余额</view>
-						<view class="money">￥197.00</view>
+						<view class="money minus">￥{{item.afterBlance}}</view>
 					</view>
 					<view class="ls-row-list">
-						<view class="time">2020/11/20 16:50:00</view>
-						<view class="senk-btn" @tap="showShade">查看</view>
+						<view class="time">{{item.creatTime}}</view>
+						<view class="senk-btn" @click="seeDetail(item)">查看</view>
 					</view>
 				</view>
 				
@@ -43,31 +38,31 @@
 					<view class="ls-form">
 						<view class="ls-form-item">
 							<view class="ls-form-label">交易单号</view>
-							<view class="ls-form-input-box">JY202011221525262525</view>
+							<view class="ls-form-input-box">{{cash.tradeNo}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">业务类型</view>
-							<view class="ls-form-input-box">订单收入</view>
+							<view class="ls-form-input-box">{{cash.bizType}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">变更前余额</view>
-							<view class="ls-form-input-box">￥197.00</view>
+							<view class="ls-form-input-box">￥{{cash.beforeBlance}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">交易金额</view>
-							<view class="ls-form-input-box">￥3.00</view>
+							<view class="ls-form-input-box">￥{{cash.amount}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">变更后余额</view>
-							<view class="ls-form-input-box">￥200.00</view>
+							<view class="ls-form-input-box">￥{{cash.afterBlance}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">对应单号</view>
-							<view class="ls-form-input-box">Q2568587895685878956</view>
+							<view class="ls-form-input-box">{{cash.orderNo}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">交易时间</view>
-							<view class="ls-form-input-box">2020/11/20 25:35:65</view>
+							<view class="ls-form-input-box">{{cash.creatTime}}</view>
 						</view>
 						<view class="ls-btn-box">
 							<button class="ls-btn ls-btn-blue" @tap.stop="closeShade">关闭</button>
@@ -86,53 +81,82 @@
 <script>
 	import gracePage from "../../graceUI/components/gracePage.vue";
 	import graceShade from "../../graceUI/components/graceShadeShopdrawlist.vue";
+	import graceEmptyNew from "../../graceUI/components/graceEmptyNew.vue";
 	import { mapState } from 'vuex';  
 		export default {
-			components:{gracePage,graceShade},
+			components:{gracePage,graceShade,graceEmptyNew},
 			data() {
 				return {
 					showlist:true,
 					hasdata:true,
-					shopId:null,
-					orderlist:[],
+					cashlist:[],
+					cash:{},						
 					queryData:{
-						shopId:null,
-						pageNum: 1,//商品列表 页码
-						pageSize:5,
+						page: 1,//商品列表 页码
+						limit:5,
 						totalPage: 0,//商品列表总页数
 					},
-					 title: 'picker',
-					array: ['中国银行', '中国人民银行', '中国工商银行', '中国邮政银行'],
-					index: 0,
+					
 				}
 				
 			},
 			onShow(){
-			
+				this. getShopcashList(this.queryData);
 			},
 			onLoad(option){
-				console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-				if(option.shopId!=null && typeof(option.shopId) != "undefined"){
-					this.shopId = option.shopId;
-					this.queryData.shopId = option.shopId;
-				}
+				
 			},
 			computed: {
 				...mapState(['hasLogin','userInfo'])
 			},
 			methods: {
-				 bindPickerChange: function(e) {
-					console.log('picker发送选择改变，携带值为', e.target.value)
-					this.index = e.target.value
+				
+				async getShopcashList (querData,first) {
+					console.log(JSON.stringify(querData));
+				    let result = await this.$api.requestGet('shopkeeper/shopWithdraw', 'capitalFlowList',querData);
+					console.log(JSON.stringify(result));
+				    if(result.code != 0 || result.page.list==null || result.page.list.length==0){
+				    	this.hasdata = false;//没有数据展示空页
+				    	return;
+				    } 
+				    this.queryData.totalPage = result.page.totalPage;
+					
+				   if(first) {//是否是刷新 或者第一次加载
+				       this.cashlist =  result.page.list ;
+				   } else {
+				       this.cashlist = this.cashlist.concat(result.page.list);
+				   }
 				},
+				//查看详细
+				seeDetail(item){
+					this.cash = item;
+					this.showShade();
+				},
+				
 				showShade : function () {
 					this.$refs.graceShade.showIt();
 				},
 				closeShade : function () {
 					this.$refs.graceShade.hideIt();
-				}
+				},
+				
 			},
-			
+			onPullDownRefresh() {
+				 this.queryData.page = 1;
+				 this.queryData.totalPage = 0;
+				 this.getShopcashList()(this.queryData,true);
+				   uni.stopPullDownRefresh();
+			 },
+			 onReachBottom(){//页面滚动到底部的事件
+			 	if (this.queryData.page > this.queryData.totalPage) {
+			 		return false;
+			 	}
+			     this.queryData.page = this.queryData.page + 1;
+			     if (this.queryData.page > this.queryData.totalPage) {
+			         return false;
+			     }
+			     this.getShopcashList(this.queryData,false);
+			 }
 		}
 </script>
 

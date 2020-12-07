@@ -226,7 +226,7 @@ export default {
 		gracePage, graceSelectMenu,graceCoupons,graceShade,graceDateTime
 	},
 	methods:{
-		//获取广告列表列表
+		//获取列表
 		getCouponList(data){
 			var that = this;
 			that.$api.request('shopkeeper/shopCoupon','couponList',data,failres => {
@@ -235,12 +235,6 @@ export default {
 				if(res.page.list!=null && res.page.list.length>0){
 					that.coupons = res.page.list;
 				}
-				// that.adslist = res.list;
-				// if(that.adslist!=null && that.adslist.length>0){
-				// 	that.adslist.forEach(p=>{
-				// 		p.isshowbtn = false;
-				// 	})
-				// }
 			});
 		},
 		//获取店铺分类列表信息

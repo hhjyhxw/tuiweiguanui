@@ -1,42 +1,33 @@
 <template>
 	<gracePage :customHeader="false">
-		<view slot="gBody" class="grace-body"  >
-			<!-- 提现记录列表start -->
-			<view class="ls-column-list" v-show="showlist">
-				<view class="list-item">
-					<view class="ls-row-list">
-						<view class="label-text">结算金额</view>
-						<view class="money">￥200.00</view>
-					</view>
-					<view class="ls-row-list">
-						<view class="label-text">结算交易金额</view>
-						<view class="money">￥197.00</view>
-					</view>
-					<view class="ls-row-list">
-						<view class="label-text">结算交易手续费</view>
-						<view class="money">￥3.00</view>
-					</view>
-					<view class="ls-row-list">
-						<view class="time">2020/11/20 16:50:00</view>
-						<view class="senk-btn">查看</view>
-					</view>
+		<view slot="gBody" class="grace-body" v-show="!hasdata">
+			<graceEmptyNew>
+				<view slot="img" class="empty-view">
+					<!-- 请根据您的项目要求制作并更换为空图片 -->
+					<image class="empty-img" mode="widthFix" src="https://staticimgs.oss-cn-beijing.aliyuncs.com/empty.png"></image>
 				</view>
+				<text slot="text" class="grace-text-small grace-gray">抱歉，暂时没有数据</text>
+			</graceEmptyNew>
+		</view>
+		<view slot="gBody" class="grace-body"  v-show="hasdata">
+			<!-- 提现记录列表start -->
+			<view class="ls-column-list" v-show="showlist" v-for="(item,index) in cashlist">
 				<view class="list-item">
 					<view class="ls-row-list">
 						<view class="label-text">结算金额</view>
-						<view class="money">￥200.00</view>
+						<view class="money">￥{{item.totalAmout}}</view>
 					</view>
 					<view class="ls-row-list">
 						<view class="label-text">结算交易金额</view>
-						<view class="money">￥197.00</view>
+						<view class="money">￥{{item.amount}}</view>
 					</view>
 					<view class="ls-row-list">
 						<view class="label-text">结算交易手续费</view>
-						<view class="money">￥3.00</view>
+						<view class="money">￥{{item.handlingFee}}</view>
 					</view>
 					<view class="ls-row-list">
-						<view class="time">2020/11/20 16:50:00</view>
-						<view class="senk-btn" @tap="showShade">查看</view>
+						<view class="time">{{item.approveTime}}</view>
+						<view class="senk-btn">查看</view>
 					</view>
 				</view>
 				
@@ -51,31 +42,35 @@
 					<view class="ls-form">
 						<view class="ls-form-item">
 							<view class="ls-form-label">结算单号</view>
-							<view class="ls-form-input-box">JY202011221525262525</view>
+							<view class="ls-form-input-box">{{drawData.orderNo}}</view>
+						</view>
+						<view class="ls-form-item">
+							<view class="ls-form-label">银行流水号</view>
+							<view class="ls-form-input-box">{{drawData.transactionId}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">结算金额</view>
-							<view class="ls-form-input-box">￥200.00</view>
+							<view class="ls-form-input-box">￥{{drawData.totalAmout}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">结算交易金额</view>
-							<view class="ls-form-input-box">￥197.00</view>
+							<view class="ls-form-input-box">￥{{drawData.amount}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">结算交易手续费</view>
-							<view class="ls-form-input-box">￥3.00</view>
+							<view class="ls-form-input-box">￥{{drawData.handlingFee}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">结算银行</view>
-							<view class="ls-form-input-box">工商银行</view>
+							<view class="ls-form-input-box">{{drawData.bankName}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">结算账号</view>
-							<view class="ls-form-input-box">2568587895685878956</view>
+							<view class="ls-form-input-box">{{drawData.cardNo}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">用户名</view>
-							<view class="ls-form-input-box">哈哈哈</view>
+							<view class="ls-form-input-box">{{drawData.userName}}</view>
 						</view>
 						<view class="ls-form-item">
 							<view class="ls-form-label">手机号</view>
@@ -106,52 +101,79 @@
 <script>
 	import gracePage from "../../graceUI/components/gracePage.vue";
 	import graceShade from "../../graceUI/components/graceShadeShopdrawlist.vue";
+	import graceEmptyNew from "../../graceUI/components/graceEmptyNew.vue";
 	import { mapState } from 'vuex';  
 		export default {
-			components:{gracePage,graceShade},
+			components:{gracePage,graceShade,graceEmptyNew},
 			data() {
 				return {
 					showlist:true,
 					hasdata:true,
-					shopId:null,
-					orderlist:[],
+					drawList:[],
+					drawData:{},						
 					queryData:{
-						shopId:null,
-						pageNum: 1,//商品列表 页码
-						pageSize:5,
-						totalPage: 0,//商品列表总页数
+						page: 1,//页码
+						limit:10,//每页记录数
+						totalPage: 0,//总页数
 					},
-					 title: 'picker',
-					array: ['中国银行', '中国人民银行', '中国工商银行', '中国邮政银行'],
-					index: 0,
 				}
 				
 			},
 			onShow(){
-			
+				this. getDrawList(this.queryData);
 			},
 			onLoad(option){
-				console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-				if(option.shopId!=null && typeof(option.shopId) != "undefined"){
-					this.shopId = option.shopId;
-					this.queryData.shopId = option.shopId;
-				}
+				
 			},
 			computed: {
 				...mapState(['hasLogin','userInfo'])
 			},
 			methods: {
-				 bindPickerChange: function(e) {
-					console.log('picker发送选择改变，携带值为', e.target.value)
-					this.index = e.target.value
+				async getDrawList (querData,first) {
+					console.log(JSON.stringify(querData));
+					let result = await this.$api.requestGet('shopkeeper/shopWithdraw', 'drawList',querData);
+					console.log(JSON.stringify(result));
+					if(result.code != 0 || result.page.list==null || result.page.list.length==0){
+						this.hasdata = false;//没有数据展示空页
+						return;
+					} 
+					this.queryData.totalPage = result.page.totalPage;
+				   if(first) {//是否是刷新 或者第一次加载
+					   this.drawList =  result.page.list ;
+				   } else {
+					   this.drawList = this.drawList.concat(result.page.list);
+				   }
 				},
+				//查看详细
+				seeDetail(item){
+					this.drawData = item;
+					this.showShade();
+				},
+				
 				showShade : function () {
 					this.$refs.graceShade.showIt();
 				},
 				closeShade : function () {
 					this.$refs.graceShade.hideIt();
-				}
+				},
+				
 			},
+			onPullDownRefresh() {
+				 this.queryData.page = 1;
+				 this.queryData.totalPage = 0;
+				 this.getDrawList()(this.queryData,true);
+				   uni.stopPullDownRefresh();
+			 },
+			 onReachBottom(){//页面滚动到底部的事件
+				if (this.queryData.page > this.queryData.totalPage) {
+					return false;
+				}
+				 this.queryData.page = this.queryData.page + 1;
+				 if (this.queryData.page > this.queryData.totalPage) {
+					 return false;
+				 }
+				 this.getDrawList(this.queryData,false);
+			 }
 			
 		}
 </script>
