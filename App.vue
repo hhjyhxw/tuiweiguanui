@@ -1,3 +1,4 @@
+
 <script>
 
 	
@@ -37,6 +38,9 @@ export default {
 }
 </script>
 <style>
+/* 加载自定义样式文件 */
+@import "common/style/mycommon.css";
+	
 /* 加载核心样式 非 nvue 平台  */
 /* #ifndef APP-PLUS-NVUE */
 @import "./graceUI/graceUI.css";

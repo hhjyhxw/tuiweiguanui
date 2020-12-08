@@ -1,0 +1,42 @@
+.ls-form{
+	padding:3px;
+	background-color: white;
+	margin-top: 10px;
+	border-radius: 5px;
+	padding-bottom: 10px;
+}
+.ls-form-item{
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	border-bottom: 1px solid #EDEDED;
+	height: 2.5rem;
+	line-height: 2.8rem;	
+}
+.ls-form-item-column{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.ls-form-label{
+	flex: 1;
+	padding-left: 15px;
+}
+.ls-form-input-box{
+	flex: 3;
+}
+.ls-btn-box{
+	
+}
+.ls-btn{
+	font-size:30rpx; line-height:88rpx; padding:0; border-radius:6rpx;
+	background:linear-gradient(to right, #00FFD5 ,#008CFF) !important; color:#FFFFFF !important;
+}
+.ls-btn::after{border-radius:5rpx !important; border:none;}
+
+.ls-form-textarea{
+	    border: 1px solid lightgray;
+	    border-radius: 1rem;
+}

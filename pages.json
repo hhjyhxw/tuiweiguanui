@@ -265,6 +265,25 @@
             }
             
         }
+        ,{
+            "path" : "pages/shopcenter/shop_selfaddress",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        },
+		{
+		    "path" : "pages/shopcenter/shopshare",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		}
+		
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

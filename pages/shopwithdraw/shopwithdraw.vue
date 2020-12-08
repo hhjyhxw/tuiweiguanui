@@ -6,45 +6,45 @@
 				<view class="ls-form-item">
 					<view class="ls-form-label">银行名称</view>
 					<view class="ls-form-input-box">
-						<!-- <input class="ls-form-input" value="" placeholder="请输入支行名称"/> -->
-						<picker @change="bindPickerChange" :value="index" :range="array">
-							<view class="ls-form-input-box">{{array[index]}}</view>
-						</picker>
-						<!-- <picker @change="bindPickerChange" :value="index" :range="array">
-							<view class="uni-input">{{array[index]}}</view>
-						</picker> -->
+						<picker mode="selector" :value="bankCardIndex" :range-key="bankName" :range="bankCardList" @change="bankCardChange">
+							  <view>{{bankCardList[bankCardIndex].bankName}}</view>
+						 </picker>
 					</view>
 				</view>
 				<view class="ls-form-item">
 					<view class="ls-form-label">支行名称</view>
-					<view class="ls-form-input-box"><input class="ls-form-input" value="" placeholder="请输入支行名称"/></view>
+					<view class="ls-form-input-box">{{bankCard.subBranch}}</view>
 				</view>
 				<view class="ls-form-item">
 					<view class="ls-form-label">用户名称</view>
-					<view class="ls-form-input-box"><input class="ls-form-input" value="" placeholder="请输入用户名称"/></view>
+					<view class="ls-form-input-box">{{bankCard.userName}}</view>
 				</view>
 				<view class="ls-form-item">
 					<view class="ls-form-label">手机号</view>
-					<view class="ls-form-input-box"><input class="ls-form-input" value="" placeholder="请输入手机号"/></view>
+					<view class="ls-form-input-box">{{bankCard.mobile}}</view>
 				</view>
 				<view class="ls-form-item">
 					<view class="ls-form-label">卡号</view>
-					<view class="ls-form-input-box"><input class="ls-form-input" value="" placeholder="请输入卡号"/></view>
+					<view class="ls-form-input-box">{{bankCard.cardNo}}</view>
 				</view>
 				<view class="ls-form-item">
 					<view class="ls-form-label">用户余额</view>
-					<view class="ls-form-input-box"><text>￥160</text></view>
+					<view class="ls-form-input-box"><text>￥{{shop.balance}}</text></view>
+				</view>
+				<view class="ls-form-item">
+					<view class="ls-form-label">最大可提现金额</view>
+					<view class="ls-form-input-box">{{ableAmount}}</view>
 				</view>
 				<view class="ls-form-item">
 					<view class="ls-form-label">提现金额</view>
-					<view class="ls-form-input-box"><input class="ls-form-input" value="" placeholder="请输入提现金额"/></view>
+					<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopDrawdto.amount" placeholder="请输入提现金额"/></view>
 				</view>
 				<view class="ls-form-item">
 					<view class="ls-form-label">手续费</view>
-					<view class="ls-form-input-box"><text>￥0.00</text></view>
+					<view class="ls-form-input-box"><text>￥{{withdrawFee}}</text></view>
 				</view>
 				<view class="ls-btn-box">
-					<button class="ls-btn ls-btn-blue">提现</button>
+					<button class="ls-btn ls-btn-blue" @click="save">提现</button>
 				</view>
 				
 			</view>
@@ -59,39 +59,104 @@ import { mapState } from 'vuex';
 		components:{gracePage,},
 		data() {
 			return {
-				hasdata:true,
-				shopId:null,
-				orderlist:[],
-				queryData:{
-					shopId:null,
-					pageNum: 1,//商品列表 页码
-					pageSize:5,
-					totalPage: 0,//商品列表总页数
+				bankCardList:[],//
+				bankCardIndex:0,//
+				bankCard:{
+					
 				},
-				 title: 'picker',
-				array: ['中国银行', '中国人民银行', '中国工商银行', '中国邮政银行'],
-				index: 0,
+				
+				shop:{
+					
+				},
+				ableAmount:null,//可以体现的金额
+				withdrawFee:null,//体现手续费率
+				shopDrawdto:{
+					shopId:null,
+					bankId:null,
+					amount:null,
+				}
+				
 			}
 			
 		},
 		onShow(){
-		
+			this.getBankCardList();
+			this.getShop();
 		},
 		onLoad(option){
-			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-			if(option.shopId!=null && typeof(option.shopId) != "undefined"){
-				this.shopId = option.shopId;
-				this.queryData.shopId = option.shopId;
-			}
+			
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo'])
 		},
 		methods: {
-			 bindPickerChange: function(e) {
-				console.log('picker发送选择改变，携带值为', e.target.value)
-				this.index = e.target.value
+			//店铺银行卡列表
+			getBankCardList(){
+				var that = this;
+				that.$api.requestGet('shopkeeper/shopBank', 'bankList',{},failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.bankCardList = res.list;
+				});
 			},
+			//
+			getShop(){
+				var that = this;
+				that.$api.requestGet('shopkeeper/shopWithdraw', 'shopblance',{},failres => {
+					that.$api.msg(failres.msg)
+				}).then(res => {
+					that.shop = res.shop;
+					that.ableAmount = res.ableAmount;
+					that.withdrawFee = res.withdrawFee;
+				});
+			},
+			 bankCardChange: function(e) {
+				this.bankCardIndex = e.target.value;
+				if(this.bankCardList!=null && this.bankCardList.length>0){
+					this.bankCard = this.bankCardList[this.bankCardIndex];
+					this.shopDrawdto.bankId = this.bankCardList[this.bankCardIndex].id;
+					this.shopDrawdto.shopId = this.bankCardList[this.bankCardIndex].shopId;
+				}
+				
+			},
+			//保存
+			save(){
+				var that = this;
+				if(that.shopDrawdto.shopId==null || that.shopDrawdto.shopId==''){
+					that.$api.msg('店铺ID参数错误')
+					return;
+				}
+				if(that.shopDrawdto.bankId==null || that.shopDrawdto.bankId==''){
+					that.$api.msg('请选择银行卡')
+					return;
+				}
+				if(that.shopDrawdto.amount==null || that.shopDrawdto.amount==''){
+					that.$api.msg('请输入提现金额')
+					return;
+				}
+				if(that.shopDrawdto.amount==null || that.shopDrawdto.amount==''){
+					that.$api.msg('请输入提现金额')
+					return;
+				}
+				if(Number(that.shopDrawdto.amount)>Number(that.ableAmount)){
+					that.$api.msg('提现金额不能大于:'+that.ableAmount)
+					return;
+				}
+				that.$api.request('shopkeeper/shopWithdraw', 'applyDraw',that.shopDrawdto, failres => {
+					uni.showToast({
+						title: failres.errmsg,
+						icon: "none"
+					});
+				}).then(res => {
+					uni.showToast({
+						title: '提交成功',
+						icon: "none"
+					});
+				})
+				
+			},
+			
+			
 		},
 		
 	}

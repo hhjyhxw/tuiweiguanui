@@ -37,8 +37,11 @@
 						<view  style="padding:20rpx 0;background-color: white;border-radius: 10px;height: 8rem;">
 							<textarea class="grace-textarea" v-model="selfaddress" placeholder="提货地址" >{{selfaddress}}</textarea>
 						</view>
-							<view class="addresssave">
+							<!-- <view class="addresssave">
 								<button type="primary" style="width: 100%;" class="grace-button" size="mini" @click="saveaddress">保存</button>
+							</view> -->
+							<view class="ls-btn-box">
+								<button class="ls-btn ls-btn-blue" @click="saveaddress()">保存</button>
 							</view>
 						<view class="close-btn grace-icons icon-close3 grace-white grace-absolute-rt" @tap.stop="closeShade"></view>
 					</view>
@@ -190,17 +193,6 @@ import graceShade from "../../graceUI/components/graceShadeShopcenter.vue";
 			}
 		},
 		onShow(){
-			if(this.shopId==null || typeof(this.shopId) == "undefined"){
-				try {
-				    const value = uni.getStorageSync('shopMainId');
-				    if (value) {
-				        console.log("value======"+value);
-						this.shopId = value;
-				    }
-				} catch (e) {
-				    // error
-				}
-			}
 			this.init();
 			
 		},
@@ -305,41 +297,6 @@ import graceShade from "../../graceUI/components/graceShadeShopcenter.vue";
 					})
 				}
 				
-			},
-			getLatestOrder(){
-				const that = this;
-				if(that.shopId==null){
-					try {
-					    const value = uni.getStorageSync('shopMainId');
-					    if (value) {
-							that.shopId = value;
-					    }
-					} catch (e) {
-					    // error
-					}
-				}
-				if(that.shopId==null){
-					return;
-				}
-				let param ={
-					'shopId':that.shopId
-				};
-				that.$api.requestGet('order', 'latesOrder',param,failres => {
-					that.$api.msg(failres.msg)
-				}).then(res => {
-					if(res.code==0 && res.order!=null){
-						console.log('res===='+JSON.stringify(res)); //打印出上个页面传递的参数。
-						that.order = res.order;
-					}else{
-						this.hasdata=false;
-					}
-				});
-			},
-			//继续支付
-			gotopay(item){
-				uni.navigateTo({
-					 url: '/pages/pay/pay?price='+item.actualPrice+'&orderNo='+item.orderNo+'&shopId='+item.shopId
-				})
 			},
 			toLogin() {
 				if (!this.hasLogin) {

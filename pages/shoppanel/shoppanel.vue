@@ -161,14 +161,14 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',
 					txt:'银行卡', smallTxt:"", bgColor:"#C4A6FB",
-					path:"/pages/shopbankcard/shopbankcard", openType:"navigate"
+					path:"/pages/shopbankcard/shopbankcardlist", openType:"navigate"
 				},
 			],
 			shopclasses : [
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/font.png', 
 					txt:'提货地址', smallTxt:"", bgColor:"#DCD64E",
-					path:"../index/index?test=1", openType:"switchTab"
+					path:"/pages/shopcenter/shop_selfaddress", openType:"navigate"
 				}
 			],
 		}
