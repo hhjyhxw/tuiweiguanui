@@ -38,6 +38,7 @@
 			this.getShopinfo();	
 		},
 		onShareAppMessage(res) {
+			var that = this;
 			return {
 			  title: that.shop.titile,
 			  path: '/pages/index/index?shopId='+that.shop.id

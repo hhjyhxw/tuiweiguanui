@@ -170,11 +170,11 @@ const requestGet = (_gp, _mt, data = {}, failCallback) => {
 						}
 
 					} else {
-						console.log("res.data==="+JSON.stringify(res.data))
+						// console.log("res.data==="+JSON.stringify(res.data))
 						if (failCallback) {
 							failCallback(res.data)
 						} else {
-							console.log("res.data.msg==="+JSON.stringify(res.data.msg))
+							// console.log("res.data.msg==="+JSON.stringify(res.data.msg))
 							uni.showToast({
 								title: res.data.msg,
 								icon: 'none'
@@ -235,11 +235,11 @@ const requestPost = (_gp, _mt, data = {}, failCallback) => {
 						}
 
 					} else {
-						console.log("res.data==="+JSON.stringify(res.data))
+						// console.log("res.data==="+JSON.stringify(res.data))
 						if (failCallback) {
 							failCallback(res.data)
 						} else {
-							console.log("res.data.msg==="+JSON.stringify(res.data.msg))
+							// console.log("res.data.msg==="+JSON.stringify(res.data.msg))
 							uni.showToast({
 								title: res.data.msg,
 								icon: 'none'
@@ -262,7 +262,7 @@ const uploadImg = (successCallback) => {
 					url: baseUrl + '/upload',
 					method: 'get',
 					success: function(signRes) {
-						console.log("signRes==="+JSON.stringify(signRes))
+						// console.log("signRes==="+JSON.stringify(signRes))
 						uni.showLoading({
 							title: '图片上传中',
 						})

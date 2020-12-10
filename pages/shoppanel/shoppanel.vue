@@ -139,7 +139,7 @@ export default {
 				{
 					icon:'https://graceui.oss-cn-beijing.aliyuncs.com/classes/mall.png',
 					txt:'店铺分享', smallTxt:"", bgColor:"#C4A6FB",
-					path:"./index?test=1", openType:"navigate"
+					path:"/pages/shopcenter/shopshare", openType:"navigate"
 				},
 			],
 			fundclasses : [

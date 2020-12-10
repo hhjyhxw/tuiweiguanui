@@ -137,7 +137,7 @@ export default{
 			this.queryData.shopId = option.shopId;
 			// uni.setStorage('shopId', option.shopId)
 			try {
-			    uni.setStorageSync('shopId', 'option.shopId');
+			    uni.setStorageSync('shopId', option.shopId);
 			} catch (e) {
 			    // error
 			}
@@ -245,12 +245,13 @@ export default{
 				this.cartNum=0;//购物车商品数量
 				this.goodsList = [];
 				this.getCartNum();
+				this.getAdsList();
 				this.getGoodlist(this.queryData,true);
 				
 			},
 			//切换tab
 			change : function(e){
-				console.log("change==="+JSON.stringify(e))
+				// console.log("change==="+JSON.stringify(e))
 				this.current = e;
 				if(this.current==1){
 					this.navTo('/pages/coupon/coupon');
@@ -267,15 +268,15 @@ export default{
 					title: '正在加载'
 				});
 				that.$api.requestGet('shop', 'index',that.queryData, failres => {
-					that.$api.msg(failres.msg)
+					// that.$api.msg(failres.msg)
 					uni.hideLoading()
 				}).then(res => {
 					if(res.code==0){
 						that.shopList = res.shoplist;
-						console.log('shopLis======'+JSON.stringify(res.shoplist));
-						if(res.adlist!=null){
-							that.adlist = res.adlist;
-						}
+						// console.log('shopLis======'+JSON.stringify(res.shoplist));
+						// if(res.adlist!=null){
+						// 	that.adlist = res.adlist;
+						// }
 						that.shop = res.shop;
 						try {
 						    uni.setStorageSync('shopId',res.shop.id);
@@ -285,11 +286,23 @@ export default{
 						//加载商品
 						that.initQueryData();
 						that.getCartNum();
+						that.getAdsList();
 						that.getGoodlist(that.queryData,true);
 						uni.hideLoading();
 					}
 				});
 				
+			},
+			getAdsList(){
+				var that = this;
+				that.$api.requestGet('shop', 'getAdsList',{'shopId':that.shop.id},failres => {
+					// that.$api.msg(failres.msg)
+				}).then(res => {
+					console.log("adlist=="+JSON.stringify(res))
+					if(res.adlist!=null && res.adlist.length>0){
+						that.adlist = res.adlist;
+					}
+				});
 			},
 			//加载购物车数量
 			getCartNum(){
@@ -306,7 +319,7 @@ export default{
 			async getGoodlist (querData,first) {
 				console.log(JSON.stringify(querData));
 			    let result = await this.$api.requestGet('shop', 'goodsList',querData);
-				console.log(JSON.stringify(result));
+				// console.log(JSON.stringify(result));
 			    if(result.code != 0 || result.page.list==null || result.page.list.length==0) return;
 			    this.queryData.totalPage = result.page.totalPage;
 			   if(first) {//是否是刷新 或者第一次加载
@@ -362,8 +375,6 @@ export default{
 			return false;
 		}
 		 this.queryData.pageNum = this.queryData.pageNum + 1;
-		 console.log("pageNum==="+this.queryData.pageNum);
-		  console.log("totalPage==="+this.queryData.totalPage);
 		 if (this.queryData.pageNum > this.queryData.totalPage) {
 			 return false;
 		 }
