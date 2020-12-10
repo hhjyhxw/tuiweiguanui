@@ -132,14 +132,15 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 			}
 		},
 		onShow() {
+			this.initShopId();
 			this.isVip = this.$api.isVip()
 			this.userinfo();
 			// this.loadFootprint()
 		},
 		onLoad(option){
-			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-			this.shopId = option.shopId;
-			this.userinfo();
+			// console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
+			// this.shopId = option.shopId;
+			// this.userinfo();
 		},
 		// #ifndef MP
 		onNavigationBarButtonTap(e) {
@@ -165,6 +166,23 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 			...mapState(['hasLogin','userInfo'])
 		},
         methods: {
+			
+			initShopId(){
+				var that =this;
+				try {
+					const value = uni.getStorageSync('shopId');
+					console.log('this.shopId1==='+(value))
+					if (value) {
+						that.shopId = value;
+					}
+				} catch (e) {
+				}
+				if(that.shopId==null){
+					uni.navigateTo({
+						url: '/pages/index/index'
+					})
+				}
+			},
 			async loadFootprint() {
 				const that = this
 				that.$api.request('footprint', 'getAllFootprint').then(res => {

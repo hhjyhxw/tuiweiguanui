@@ -74,39 +74,37 @@ import { mapState } from 'vuex';
 			
 		},
 		onShow(){
-			if(this.queryData.shopId==null || typeof(this.queryData.shopId) == "undefined"){
-				try {
-				    const value = uni.getStorageSync('shopMainId');
-				    if (value) {
-				        console.log("value======"+value);
-						this.queryData.shopId = value;
-				    }
-				} catch (e) {
-				    // error
-				}
-			}
+			this.initShopId();
 			this.init();
 		},
 		onLoad(option){
-			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-			if(option.shopId!=null && typeof(option.shopId) != "undefined"){
-				this.shopId = option.shopId;
-				this.queryData.shopId = option.shopId;
-			}
+			
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo'])
 		},
 		methods: {
+			initShopId(){
+				try {
+					const value = uni.getStorageSync('shopId');
+					if (value) {
+						this.shopId = value;
+						this.queryData.shopId=value;
+					}
+				} catch (e) {
+				}
+				if(this.shopId==null){
+					uni.navigateTo({
+						url: '/pages/index/index'
+					})
+				}
+			},
 			changeAccordion : function(e){
 						var accordionIndex = e.currentTarget.id;
 						if (this.accordionActive == accordionIndex){accordionIndex = '';}
 						this.accordionActive = accordionIndex;
 					},
 			init(){
-				if(this.queryData.shopId==null  || typeof(this.queryData.shopId) == "undefined" || this.queryData.shopId=='null' ){
-					return;
-				}
 				this.getTotalAmount();
 				this.getOrderList(this.queryData,true);
 			},

@@ -80,14 +80,27 @@
 			}
 		},
 		onShow() {
+			this.initShopId();
 			this.getCouponlist(this.queryData,true);
 		},
 		onLoad(option){
-			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-			this.shopId = option.shopId;
-			this.queryData.shopId = option.shopId;
 		},
 		methods: {
+			initShopId(){
+				try {
+					const value = uni.getStorageSync('shopId');
+					if (value) {
+						this.shopId = value;
+						this.queryData.shopId=value;
+					}
+				} catch (e) {
+				}
+				if(this.shopId==null){
+					uni.navigateTo({
+						url: '/pages/index/index'
+					})
+				}
+			},
 			//切换tab
 			 onChange(e) {
 				 this.current = e;

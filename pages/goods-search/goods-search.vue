@@ -136,21 +136,33 @@
 			}
 		},
 		onShow() {
+			this.initShopId();
+			this.init();
 			this.getCartNum();
 		},
 		onLoad(option) {
-			this.init();
-			console.log("index_option===="+JSON.stringify(option));
-			if(option!=null && option.shopId!=undefined){
-				this.queryData.shopId = option.shopId;
-				this.shopId = option.shopId;
-			}
+			
 		},
 		components: {
 			//引用mSearch组件，如不需要删除即可
 			mSearch,gracePage, graceFlex, graceSearch
 		},
 		methods: {
+			initShopId(){
+				try {
+					const value = uni.getStorageSync('shopId');
+					if (value) {
+						this.shopId = value;
+						this.queryData.shopId=value;
+					}
+				} catch (e) {
+				}
+				if(this.shopId==null){
+					uni.navigateTo({
+						url: '/pages/index/index'
+					})
+				}
+			},
 			init() {
 				this.loadDefaultKeyword();//默认搜索
 				this.loadOldKeyword();//历史搜索

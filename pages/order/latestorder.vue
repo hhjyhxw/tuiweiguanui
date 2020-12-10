@@ -64,27 +64,31 @@ import graceEmptyNew from "../../graceUI/components/graceEmptyNew.vue";
 			}
 		},
 		onShow(){
-			if(this.shopId==null || typeof(this.shopId) == "undefined"){
-				try {
-				    const value = uni.getStorageSync('shopMainId');
-				    if (value) {
-				        console.log("value======"+value);
-						this.shopId = value;
-				    }
-				} catch (e) {
-				    // error
-				}
-			}
+			this.initShopId();
 			this.getLatestOrder();
 		},
 		onLoad(option){
-			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-			this.shopId = option.shopId;
+			// console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
+			// this.shopId = option.shopId;
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo'])
 		},
 		methods: {
+			initShopId(){
+				try {
+					const value = uni.getStorageSync('shopId');
+					if (value) {
+						this.shopId = value;
+					}
+				} catch (e) {
+				}
+				if(this.shopId==null){
+					uni.navigateTo({
+						url: '/pages/index/index'
+					})
+				}
+			},
 			getLatestOrder(){
 				const that = this;
 				if(that.shopId==null){

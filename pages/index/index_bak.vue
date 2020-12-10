@@ -104,51 +104,45 @@ export default{
 			
 			address:'星光之约一期',
 			title:'hahh',
+			shopId:null,
 			shopList:[
 			],
 			goodsList:[
 			],
 			queryData:{
-				shopId:-1,
+				shopId:null,
 				pageNum: 1,//商品列表 页码
 				pageSize:15,
 				totalPage: 0,//商品列表总页数
 				keyword:'',//商品名称关键字搜索
 			},
 			cartNum:0,//购物车商品数量
-			// shopMainId:null,//分享的店铺id
-			// shopMainName:'',//分享标题
-			// shopImg:'',//分享图片
-			shop:{
-				id:null,
-				shopName:'',
-				shopImg:'',
-			}
+			shopMainId:null,//分享的店铺id
+			shopMainName:'',//分享标题
+			shopImg:'',//分享图片
 		}
 	},
 	onShow() {
-		this.loadShopData();
+		this.loadShopData(this.queryData);
 		this.getAddress();
-	
+		this.getCartNum();
 	},
 	onLoad(option) {
 		console.log("index_option===="+JSON.stringify(option));
 		if(option!=null && option.shopId!=undefined && typeof(option.shopId) != "undefined"){
+			console.log("option.shopId!=undefined===="+JSON.stringify(option.shopId!=undefined));
+			this.shopId = option.shopId;
+			this.shopMainId = option.shopId;
 			this.queryData.shopId = option.shopId;
-			// uni.setStorage('shopId', option.shopId)
-			try {
-			    uni.setStorageSync('shopId', 'option.shopId');
-			} catch (e) {
-			    // error
-			}
+			uni.setStorageSync('shopMainId', option.shopId)
 		}
 	},
 	//分享
 	onShareAppMessage() {
 		return {
-			title: this.shop.shopName,
-			imageUrl: this.shop.shopImg,
-			path: '/pages/index/index?shopId=' + this.shop.id
+			title: this.shopMainName,
+			imageUrl: this.shopImg,
+			path: '/pages/index/index?shopId=' + this.shopMainId
 		}
 	},
 	computed: {
@@ -156,33 +150,7 @@ export default{
 	},
 	methods:{
 		
-		//初始化页面参数
-		initQueryData(shopId){
-			if(shopId!=null && shopId!='' && typeof(shopId) != "undefined"){
-				this.shop.id=shopId;
-			}else{
-				if(this.shop.id==null){
-					try {
-					    const value = uni.getStorageSync('shopId');
-					    if (value) {
-							this.shop.id = value;
-					    }
-					} catch (e) {
-					}
-				}
-				if(this.shop.id==null){
-					this.shop.id=-1;
-				}
-			}
-			
-			this.queryData={
-				shopId:this.shop.id,
-				pageNum: 1,//商品列表 页码
-				pageSize:15,
-				totalPage: 0,//商品列表总页数
-				keyword:'',//商品名称关键字搜索
-			}
-		},
+		
 		taped : function(url){
 			var that = this;
 			url = url+'?shopId='+that.shopId;
@@ -220,14 +188,26 @@ export default{
 				if(keyword==null || keyword==''){
 					return;
 				}
-				this.initQueryData();
-				this.queryData.keyword = keyword;
+				this.queryData = {
+					shopId:this.shopId,
+					pageNum: 1,//商品列表 页码
+					pageSize:15,
+					totalPage: 0,//商品列表总页数
+					keyword:keyword
+				},
 				this.goodsList = [];
 				this.getGoodlist(this.queryData,true);
 			},
 			//点击店铺
 			changeShop(shopId,item,index) {
-				this.initQueryData(shopId);
+				this.shopId = shopId;
+				console.log("shopId===="+shopId);
+				this.queryData = {
+					shopId:shopId,
+					pageNum: 1,//商品列表 页码
+					pageSize:15,
+					totalPage: 0,//商品列表总页数
+				},
 				this.shopList.forEach(p=>{
 					if(p.id==shopId){
 						p.active = true;
@@ -235,13 +215,11 @@ export default{
 						p.active = false;
 					}
 				})
-				try {
-				    uni.setStorageSync('shopId',shopId);
-				} catch (e) {
-				    // error
-				}
-				this.shop.shopImg = item.shopImg;
-				this.shop.shopName = item.shopName;
+				
+				uni.setStorageSync('shopMainId',shopId)
+				this.shopImg = item.shopImg;
+				this.shopMainId = shopId;
+				this.shopMainName = item.shopName;
 				this.cartNum=0;//购物车商品数量
 				this.goodsList = [];
 				this.getCartNum();
@@ -260,13 +238,24 @@ export default{
 				}
 			},
 			//加载店铺广告、店铺及分店
-			loadShopData() {
+			loadShopData(data) {
+				if(data.shopId==null || data.shopId==undefined || data.shopId=='null' || data.shopId==''){
+					try {
+					    const value = uni.getStorageSync('shopMainId');
+					    if (value) {
+					        console.log("value======"+value);
+							data.shopId = value;
+					    }
+					} catch (e) {
+					    // error
+					}
+				}
+				data.shopIds = data.shopId;
 				const that = this
-				that.initQueryData();
 				uni.showLoading({
 					title: '正在加载'
-				});
-				that.$api.requestGet('shop', 'index',that.queryData, failres => {
+				})
+				that.$api.requestGet('shop', 'shoplist',data, failres => {
 					that.$api.msg(failres.msg)
 					uni.hideLoading()
 				}).then(res => {
@@ -276,15 +265,14 @@ export default{
 						if(res.adlist!=null){
 							that.adlist = res.adlist;
 						}
-						that.shop = res.shop;
-						try {
-						    uni.setStorageSync('shopId',res.shop.id);
-						} catch (e) {
-						    // error
-						}
-						//加载商品
-						that.initQueryData();
+						that.shopId = res.shopId;
+						that.shopMainId = res.shopMainId;//分享的店铺id
+						that.shopMainName = res.shopMainName;//分享标题
+						that.shopImg = res.shopImg;//分享图片
+						that.queryData.shopId = res.shopId;
+						
 						that.getCartNum();
+						//加载商品
 						that.getGoodlist(that.queryData,true);
 						uni.hideLoading();
 					}
@@ -294,13 +282,23 @@ export default{
 			//加载购物车数量
 			getCartNum(){
 				var that = this;
-				that.$api.requestGet('cart', 'countCart',{'shopId':that.shop.id},failres => {
-					that.$api.msg(failres.msg)
-				}).then(res => {
-					if(res.code==0){
-						that.cartNum = res.totalNum;
+				if (that.hasLogin) {
+					let shopId =  null;
+					try {
+						shopId = Number(that.shopId);
 					}
-				});
+					catch(err){
+						return;
+					}
+					if(shopId==null)return;
+					that.$api.requestGet('cart', 'countCart',{'shopId':shopId},failres => {
+						that.$api.msg(failres.msg)
+					}).then(res => {
+						if(res.code==0){
+							that.cartNum = res.totalNum;
+						}
+					});
+				}
 			},
 			//获取店铺商品列表
 			async getGoodlist (querData,first) {
@@ -319,7 +317,7 @@ export default{
 			addCart(item){
 				const that = this
 				let param ={
-					'shopId':that.shop.id,
+					'shopId':that.shopId,
 					'skuId':item.skuId,
 					'groupId':item.id
 				};
@@ -338,7 +336,7 @@ export default{
 			 */
 			navTo(url){
 				var that = this;
-				url = url+'?shopId='+that.shop.id;
+				url = url+'?shopId='+that.shopId;
 				uni.navigateTo({  
 					url
 				})
@@ -346,7 +344,7 @@ export default{
 			gotocart(){
 				const that = this;
 				uni.navigateTo({
-					 url: '/pages/cart/cart?shopId='+that.shop.id
+					 url: '/pages/cart/cart?shopId='+that.shopId
 				})
 			},
 			

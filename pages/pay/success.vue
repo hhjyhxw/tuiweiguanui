@@ -17,10 +17,27 @@
 				shopId:null,
 			}
 		},
+		onShow() {
+			this.initShopId();
+		},
 		onLoad(options) {
-			this.shopId = options.shopId
+			// this.shopId = options.shopId
 		},
 		methods: {
+			initShopId(){
+				try {
+					const value = uni.getStorageSync('shopId');
+					if (value) {
+						this.shopId = value;
+					}
+				} catch (e) {
+				}
+				if(this.shopId==null){
+					uni.navigateTo({
+						url: '/pages/index/index'
+					})
+				}
+			},
 			toIndex(){
 				var that = this;
 				var url = '/pages/index/index?shopId='+that.shopId;

@@ -59,12 +59,27 @@
 
 		},
 		onLoad(options) {
+			this.initShopId();
 			this.price = options.price
 			this.orderNo = options.orderNo
-			this.shopId = options.shopId
+			// this.shopId = options.shopId
 		},
 
 		methods: {
+			initShopId(){
+				try {
+					const value = uni.getStorageSync('shopId');
+					if (value) {
+						this.shopId = value;
+					}
+				} catch (e) {
+				}
+				if(this.shopId==null){
+					uni.navigateTo({
+						url: '/pages/index/index'
+					})
+				}
+			},
 			//选择支付方式
 			changePayType(type) {
 				this.payType = type;

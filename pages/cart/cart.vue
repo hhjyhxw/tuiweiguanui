@@ -120,17 +120,28 @@ import util from '../../common/util.js';
 			}
 		},
 		onShow() {
-			console.log('this.shopId===='+JSON.stringify(this.shopId)); //打印出上个页面传递的参数。
+			this.initShopId();
 			this.getCartList();
-			// this.getCouponlist(this.queryData,true);
 			
 		},
 		onLoad(option){
-			console.log('option===='+JSON.stringify(option)); //打印出上个页面传递的参数。
-			this.shopId = option.shopId;
-			this.queryData.shopId = option.shopId;
+			
 		},
 		methods: {
+			initShopId(){
+				try {
+					const value = uni.getStorageSync('shopId');
+					if (value) {
+						this.shopId = value;
+					}
+				} catch (e) {
+				}
+				if(this.shopId==null){
+					uni.navigateTo({
+						url: '/pages/index/index'
+					})
+				}
+			},
 			//显示优惠券面板
 			toggleMask(type) {
 				let timer = type === 'show' ? 10 : 300;
