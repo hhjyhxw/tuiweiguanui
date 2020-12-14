@@ -17,7 +17,7 @@
 									<button type="default" v-show="shop.status=='1'"  class="grace-button" size="mini" style="margin-bottom: 10px;" @click="updateShopSatus('0')">关闭</button>
 								</view>
 								<view>
-									<button type="default" class="grace-button" size="mini">提现</button>
+									<button type="default" class="grace-button" size="mini" @click="navigo('/pages/shopwithdraw/shopwithdraw')">提现</button>
 								</view>
 							</view>
 						</view>

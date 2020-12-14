@@ -85,7 +85,8 @@
         ,{
             "path" : "pages/order/order",
            "style": {
-           	"navigationBarTitleText": "订单列表"
+           	"navigationBarTitleText": "订单列表",
+			"enablePullDownRefresh": true
            }
         }
         ,{
@@ -160,7 +161,7 @@
           "style" :
           {
               "navigationBarTitleText": "优惠券",
-              "enablePullDownRefresh": false
+              "enablePullDownRefresh": true
           }
             
         }
@@ -169,7 +170,7 @@
            "style" :
            {
                "navigationBarTitleText": "广告维护",
-               "enablePullDownRefresh": false
+               "enablePullDownRefresh": true
            }
             
         }
@@ -178,7 +179,7 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "今日订单",
-                "enablePullDownRefresh": false
+                "enablePullDownRefresh": true
             }
             
         }
@@ -187,7 +188,7 @@
 		    "style" :                                                                                    
 		    {
 		        "navigationBarTitleText": "历史订单",
-		        "enablePullDownRefresh": false
+		        "enablePullDownRefresh": true
 		    }
 		    
 		}
@@ -196,7 +197,7 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "银行卡",
-                "enablePullDownRefresh": false
+                "enablePullDownRefresh": true
             }
             
         }
@@ -214,7 +215,7 @@
 		    "style" :                                                                                    
 		    {
 		        "navigationBarTitleText": "提现记录",
-		        "enablePullDownRefresh": false
+		        "enablePullDownRefresh": true
 		    }
 		    
 		},
@@ -223,7 +224,7 @@
 		    "style" :                                                                                    
 		    {
 		        "navigationBarTitleText": "资金明细",
-		        "enablePullDownRefresh": false
+		        "enablePullDownRefresh": true
 		    }
 		    
 		}
@@ -233,7 +234,7 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
+                "enablePullDownRefresh": true
             }
             
         }

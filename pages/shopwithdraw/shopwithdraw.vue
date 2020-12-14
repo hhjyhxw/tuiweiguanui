@@ -6,7 +6,7 @@
 				<view class="ls-form-item">
 					<view class="ls-form-label">银行名称</view>
 					<view class="ls-form-input-box">
-						<picker mode="selector" :value="bankCardIndex" :range-key="bankName" :range="bankCardList" @change="bankCardChange">
+						<picker mode="selector" :value="bankCardIndex" :range-key="'bankName'" :range="bankCardList" @change="bankCardChange">
 							  <view>{{bankCardList[bankCardIndex].bankName}}</view>
 						 </picker>
 					</view>
@@ -40,7 +40,7 @@
 					<view class="ls-form-input-box"><input class="ls-form-input" v-model="shopDrawdto.amount" placeholder="请输入提现金额"/></view>
 				</view>
 				<view class="ls-form-item">
-					<view class="ls-form-label">手续费</view>
+					<view class="ls-form-label">手续费率</view>
 					<view class="ls-form-input-box"><text>￥{{withdrawFee}}</text></view>
 				</view>
 				<view class="ls-btn-box">
@@ -74,7 +74,8 @@ import { mapState } from 'vuex';
 					shopId:null,
 					bankId:null,
 					amount:null,
-				}
+				},
+				subflag:false,
 				
 			}
 			
@@ -97,6 +98,11 @@ import { mapState } from 'vuex';
 					that.$api.msg(failres.msg)
 				}).then(res => {
 					that.bankCardList = res.list;
+					if(that.bankCardList!=null && that.bankCardList.length>0){
+						that.bankCard = that.bankCardList[that.bankCardIndex];
+						that.shopDrawdto.bankId = that.bankCardList[that.bankCardIndex].id;
+						that.shopDrawdto.shopId = that.bankCardList[that.bankCardIndex].shopId;
+					}
 				});
 			},
 			//
@@ -117,44 +123,59 @@ import { mapState } from 'vuex';
 					this.shopDrawdto.bankId = this.bankCardList[this.bankCardIndex].id;
 					this.shopDrawdto.shopId = this.bankCardList[this.bankCardIndex].shopId;
 				}
-				
 			},
+		
 			//保存
 			save(){
 				var that = this;
-				if(that.shopDrawdto.shopId==null || that.shopDrawdto.shopId==''){
-					that.$api.msg('店铺ID参数错误')
-					return;
+				if(!that.subflag){
+					that.subflag = true;
+					if(that.bankCardIndex==-1){
+						that.$api.msg('请选择银行卡')
+						return;
+					}
+					if(that.shopDrawdto.shopId==null || that.shopDrawdto.shopId==''){
+						that.$api.msg('店铺ID参数错误')
+						return;
+					}
+					if(that.shopDrawdto.bankId==null || that.shopDrawdto.bankId==''){
+						that.$api.msg('请选择银行卡')
+						return;
+					}
+					if(that.shopDrawdto.amount==null || that.shopDrawdto.amount==''){
+						that.$api.msg('请输入提现金额')
+						return;
+					}
+					if(that.shopDrawdto.amount==null || that.shopDrawdto.amount==''){
+						that.$api.msg('请输入提现金额')
+						return;
+					}
+					
+					if(Number(that.shopDrawdto.amount)>Number(that.ableAmount)){
+						that.$api.msg('提现金额不能大于:'+that.ableAmount)
+						return;
+					}
+					that.$api.request('shopkeeper/shopWithdraw', 'applyDraw',that.shopDrawdto, failres => {
+						uni.showToast({
+							title: failres.msg,
+							icon: "none"
+						});
+					}).then(res => {
+						uni.showToast({
+							title: '提交成功',
+							icon: "none"
+						});
+						setTimeout(function () {
+							that.goback()
+						}, 1000);
+					})
 				}
-				if(that.shopDrawdto.bankId==null || that.shopDrawdto.bankId==''){
-					that.$api.msg('请选择银行卡')
-					return;
-				}
-				if(that.shopDrawdto.amount==null || that.shopDrawdto.amount==''){
-					that.$api.msg('请输入提现金额')
-					return;
-				}
-				if(that.shopDrawdto.amount==null || that.shopDrawdto.amount==''){
-					that.$api.msg('请输入提现金额')
-					return;
-				}
-				if(Number(that.shopDrawdto.amount)>Number(that.ableAmount)){
-					that.$api.msg('提现金额不能大于:'+that.ableAmount)
-					return;
-				}
-				that.$api.request('shopkeeper/shopWithdraw', 'applyDraw',that.shopDrawdto, failres => {
-					uni.showToast({
-						title: failres.errmsg,
-						icon: "none"
-					});
-				}).then(res => {
-					uni.showToast({
-						title: '提交成功',
-						icon: "none"
-					});
-				})
-				
 			},
+			goback(){
+				uni.navigateBack({
+					animationType: 'pop-in',animationDuration: 200
+				})
+			}
 			
 			
 		},

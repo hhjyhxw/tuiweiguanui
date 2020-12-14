@@ -322,7 +322,7 @@ import gracePage from "../../graceUI/components/gracePage.vue";
 					
 				}, failres => {
 					uni.showToast({
-						title: failres.errmsg,
+						title: failres.msg,
 						icon: "none"
 					});
 				}).then(res => {

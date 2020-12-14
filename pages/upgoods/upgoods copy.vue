@@ -264,7 +264,7 @@ export default {
 		/* 选择图片 */
 		chooseImg() { //选择图片
 			const that = this
-			that.$api.uploadImg((res => {
+			that.$api.uploadfile((res => {
 				that.spu.img = res;
 			}))
 		},

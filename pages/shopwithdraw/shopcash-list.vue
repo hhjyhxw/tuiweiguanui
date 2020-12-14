@@ -93,7 +93,7 @@
 					cash:{},						
 					queryData:{
 						page: 1,//商品列表 页码
-						limit:5,
+						limit:10,
 						totalPage: 0,//商品列表总页数
 					},
 					
@@ -111,7 +111,7 @@
 			},
 			methods: {
 				
-				async getShopcashList (querData,first) {
+				async getShopcashList(querData,first) {
 					console.log(JSON.stringify(querData));
 				    let result = await this.$api.request('shopkeeper/shopWithdraw', 'capitalFlowList',querData);
 					console.log(JSON.stringify(result));
@@ -144,7 +144,7 @@
 			onPullDownRefresh() {
 				 this.queryData.page = 1;
 				 this.queryData.totalPage = 0;
-				 this.getShopcashList()(this.queryData,true);
+				 this.getShopcashList(this.queryData,true);
 				   uni.stopPullDownRefresh();
 			 },
 			 onReachBottom(){//页面滚动到底部的事件

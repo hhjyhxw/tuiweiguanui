@@ -336,10 +336,13 @@ const uploadfile = (successCallback) => {
 							
 						},
 						success: function(uploadRes) {
+							console.log("uploadfile=="+JSON.stringify(uploadRes));
 							uni.hideLoading()
 							if (uploadRes.statusCode === 200) {
 								if (successCallback) {
-									successCallback(uploadRes.data)
+									// console.log("uploadfile=="+JSON.stringify(uploadRes.data));
+									// console.log("url=="+uploadRes.data.url)
+									successCallback(JSON.parse(uploadRes.data).url)
 								} else {
 									uni.showToast({
 										title: '上传成功',
